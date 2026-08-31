@@ -332,7 +332,7 @@ body{touch-action:pan-x pan-y}
 @media(max-width:700px){.freestyle-builder-grid,.freestyle-start-fields,.freestyle-finish-fields,.freestyle-summary{grid-template-columns:1fr}.freestyle-course{min-width:650px}.freestyle-active-banner{align-items:flex-start;flex-direction:column}}
 
 
-/* v37 Competition / Fleet trial */
+/* v38 Competition / Fleet internet trial */
 .competition-hint{display:none;margin-top:12px;padding:12px;border:1px solid #365365;border-radius:12px;background:#081821}
 .competition-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .competition-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}
@@ -350,8 +350,13 @@ body{touch-action:pan-x pan-y}
 .fleet-name{font-weight:900}.fleet-age{font-size:10px;color:var(--muted)}
 .competition-note{border-left:3px solid #ffd541;padding-left:10px}
 @media(max-width:700px){.competition-grid,.competition-summary{grid-template-columns:1fr}.competition-live-banner{align-items:flex-start;flex-direction:column}.competition-map-viewport{height:56vh;min-height:360px}}
+.available-races-grid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:end;margin-top:12px}
+.available-races-grid select{min-height:44px}
+.race-directory-status{margin-top:7px}
+.relay-public-note{border-left:3px solid #ffb04a;padding-left:10px}
+@media(max-width:700px){.available-races-grid{grid-template-columns:1fr}}
 
-</style></head><body><header class="topbar"><div class="brandrow"><div class="brand"><h1>⛵ SparklesGPT</h1><small>DBSC 2026 Browser Sailing App · v37</small></div><div class="topstatus"><span class="mini" id="clock">--:--</span><span class="mini">GPS <b id="gpsStatus">Idle</b></span><span class="mini">Wind <b id="weatherStatus">—</b></span><span class="mini">Course <b id="courseStatus">—</b></span></div></div><nav class="tabs">
+</style></head><body><header class="topbar"><div class="brandrow"><div class="brand"><h1>⛵ SparklesGPT</h1><small>DBSC 2026 Browser Sailing App · v38</small></div><div class="topstatus"><span class="mini" id="clock">--:--</span><span class="mini">GPS <b id="gpsStatus">Idle</b></span><span class="mini">Wind <b id="weatherStatus">—</b></span><span class="mini">Course <b id="courseStatus">—</b></span></div></div><nav class="tabs">
 <button class="tab-btn active" data-tab="selection">Course Selection</button>
 <button class="tab-btn" data-tab="startmarks">Start &amp; Marks</button>
 <button class="tab-btn" data-tab="freestyle">Freestyle / Coastal</button>
@@ -376,7 +381,7 @@ body{touch-action:pan-x pan-y}
 <div class="grid2"><div><label>Race type</label><select id="raceType"><option value="dbsc" selected>Fixed DBSC Course</option><option value="freestyle">Freestyle / Coastal</option><option value="competition">Competition / Fleet</option></select><div class="note race-type-note">Freestyle / Coastal lets you select any stored marks, set their order and choose PORT or STARBOARD rounding.</div></div><div><div class="statuscard"><small>Active course mode</small><b id="raceTypeStatus">Fixed DBSC</b></div></div></div>
 <div id="fixedCourseFields"><div class="grid2"><div><label>Race day</label><select id="day"></select></div><div><label>Fleet / start</label><select id="fleet"></select></div></div><label>Signalled DBSC course</label><select id="course"></select><div id="cardInfo" class="note" style="margin-top:7px"></div></div>
 <div id="freestyleSetupHint" class="freestyle-hint"><strong>Freestyle / Coastal selected.</strong><div class="note" style="margin-top:4px">Build or edit the route in the Freestyle / Coastal tab. The builder remains editable after activation, so last-minute course changes can be applied without rebuilding from scratch. The normal Sailing Assistant, GPS tracking, voice guidance and analysis use the active route.</div><button class="secondary" type="button" id="openFreestyleBtn" style="margin-top:8px">Open Freestyle / Coastal Builder</button></div>
-<div id="competitionSetupHint" class="competition-hint"><strong>Competition / Fleet selected.</strong><div class="note" style="margin-top:4px">Use the normal DBSC course controls, then create or join a Fleet room. The trial can animate simulated boats immediately and can exchange live state between tabs/windows on the same SparklesGPT origin.</div><button class="secondary" type="button" id="openCompetitionBtn" style="margin-top:8px">Open Competition / Fleet</button></div>
+<div id="competitionSetupHint" class="competition-hint"><strong>Competition / Fleet selected.</strong><div class="note" style="margin-top:4px">Use the normal DBSC course controls, then create or join a Fleet room. The trial can animate simulated boats immediately and can use the internet relay to share live state between separate phones, laptops and boats.</div><button class="secondary" type="button" id="openCompetitionBtn" style="margin-top:8px">Open Competition / Fleet</button></div>
 <div class="setup-summary-row">
   <div><small>Tide</small><b id="setupTideState">—</b></div>
   <div><small>Relative strength</small><b id="setupTideStrength">—</b></div>
@@ -515,20 +520,25 @@ body{touch-action:pan-x pan-y}
 <section class="tab-panel" data-tab="competition">
   <div class="panel">
     <h2>Competition / Fleet Trial</h2>
-    <p class="lead">Run the normal SparklesGPT course and navigation locally while adding a shared fleet layer for live boat positions, course state and timing.</p>
-    <div id="competitionLiveBanner" class="competition-live-banner"><div><span class="live-dot">●</span> <b id="competitionConnection">OFFLINE</b><div id="competitionConnectionDetail" class="note">Create or join a trial room, or start the demo fleet.</div></div><button class="secondary" id="competitionDemoBtn" type="button">▶ Start Demo Fleet</button></div>
+    <p class="lead">Run normal SparklesGPT navigation locally while adding an optional internet fleet layer for live boat positions, shared course information and timing.</p>
+    <div id="competitionLiveBanner" class="competition-live-banner"><div><span class="live-dot">●</span> <b id="competitionConnection">OFFLINE</b><div id="competitionConnectionDetail" class="note">Looking for available races…</div></div><button class="secondary" id="competitionDemoBtn" type="button">▶ Start Demo Fleet</button></div>
     <div class="competition-grid">
       <div><label>Your boat name</label><input id="competitionBoatName" value="Prospect" maxlength="24"></div>
-      <div><label>Race room code</label><input id="competitionRoomCode" value="" maxlength="8" placeholder="e.g. DBSC42"></div>
+      <div><label>Race name (when creating)</label><input id="competitionRaceName" value="" maxlength="40" placeholder="e.g. Thursday Blue · K3"></div>
     </div>
-    <div class="actions"><button class="primary" id="competitionCreateBtn" type="button">Create Race Room</button><button class="secondary" id="competitionJoinBtn" type="button">Join Race Room</button><button class="danger" id="competitionLeaveBtn" type="button">Leave Room</button></div>
+    <div class="actions"><button class="primary" id="competitionCreateBtn" type="button">Create &amp; Host Race</button></div>
+    <div class="available-races-grid">
+      <div><label>Available races</label><select id="competitionAvailableRaces"><option value="">Searching for races…</option></select><div id="competitionDirectoryStatus" class="note race-directory-status">Internet race directory connecting…</div></div>
+      <button class="secondary" id="competitionRefreshRacesBtn" type="button">↻ Refresh</button>
+    </div>
+    <div class="actions"><button class="primary" id="competitionJoinBtn" type="button">Join Selected Race</button><button class="danger" id="competitionLeaveBtn" type="button">Leave Race</button></div>
     <div class="competition-summary">
-      <div class="statuscard"><small>Room</small><b id="competitionRoomStatus">—</b></div>
+      <div class="statuscard"><small>Race / room</small><b id="competitionRoomStatus">—</b></div>
       <div class="statuscard"><small>Boats live</small><b id="competitionBoatCount">1</b></div>
       <div class="statuscard"><small>Shared course</small><b id="competitionCourseStatus">—</b></div>
       <div class="statuscard"><small>Shared clock</small><b id="competitionClockStatus">—</b></div>
     </div>
-    <p class="note competition-note" style="margin-top:12px">Trial networking uses the browser's local BroadcastChannel, so it can exchange live state between SparklesGPT tabs/windows on the same site/device. The Demo Fleet works anywhere. A small internet relay service is still required before separate phones on different boats can share the room over mobile data.</p>
+    <p class="note relay-public-note" style="margin-top:12px">v38 uses a public ntfy.sh relay for this trial, so a phone and laptop on different connections can share a race without installing a server. Race announcements and fleet packets are temporary trial data and are not private. Normal GPS navigation and race recording remain local and continue if the relay drops.</p>
   </div>
   <div class="panel">
     <h2>Live Fleet Map</h2>
@@ -1120,39 +1130,83 @@ function updateRaceTypeUI(){
 
 
 
-/* v37 Competition / Fleet trial */
-let competitionChannel=null,competitionRoom='',competitionHost=false,competitionDemo=false,competitionDemoTimer=null,competitionBroadcastTimer=null,competitionAnimFrame=null;
-let competitionBoats=new Map();
+/* v38 Competition / Fleet internet trial */
+let competitionChannel=null,competitionRoomSocket=null,competitionDirectorySocket=null,competitionRoom='',competitionHost=false,competitionDemo=false,competitionDemoTimer=null,competitionBroadcastTimer=null,competitionRelayTimer=null,competitionDirectoryTimer=null,competitionAnimFrame=null;
+let competitionBoats=new Map(),competitionAvailableRaces=new Map(),competitionHostState=null;
 let competitionZoom={scale:1,x:0,y:0};
+let competitionRelayState='offline',competitionLastRelayRx=0;
 const competitionSelfId=sessionStorage.getItem('sparklesCompetitionBoatId')||('boat-'+Math.random().toString(36).slice(2,9));sessionStorage.setItem('sparklesCompetitionBoatId',competitionSelfId);
 const COMP_COLOURS=['#ff8a3d','#55b8ff','#d87cff','#ffd541','#6de0b1','#ff6f91'];
+const COMP_RELAY_BASE='https://ntfy.sh';
+const COMP_RELAY_WS='wss://ntfy.sh';
+const COMP_DIRECTORY_TOPIC='sparklesgpt-dbsc-races-2026-v38-7f91c2e8';
 function competitionBoatName(){return ($('competitionBoatName')?.value||'Prospect').trim()||'Prospect'}
 function competitionCourseLabel(){return isFreestyle()?'Freestyle':($('course')?.value||'—')}
+function competitionRaceName(){const typed=($('competitionRaceName')?.value||'').trim();return typed||`${$('day')?.value||'DBSC'} · ${$('fleet')?.value||'Fleet'} · ${competitionCourseLabel()}`}
 function competitionRaceSeconds(){return raceStartEpoch?Math.max(0,(Date.now()-raceStartEpoch)/1000):(raceState==='PRESTART'?Math.max(0,300-raceTimerRemaining):0)}
 function formatElapsedSeconds(sec){sec=Math.max(0,Math.floor(Number(sec)||0));const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;return h?`${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`:`${m}:${String(s).padStart(2,'0')}`}
+function competitionRandomRoom(){try{const a=new Uint8Array(5);crypto.getRandomValues(a);return 'DB'+Array.from(a,x=>(x%36).toString(36)).join('').toUpperCase()}catch(e){return ('DB'+Math.random().toString(36).slice(2,7)).toUpperCase()}}
+function competitionTopic(room){return `sparklesgpt-dbsc-race-v38-${String(room||'').toLowerCase()}`}
 function competitionOwnPacket(){
  const r=route[idx],m=r&&marks[r.code],n=m?nav(pos,m):null,vmg=n?sog*Math.cos(rad(delta(cog,n.bearing))):0;
  return {type:'telemetry',room:competitionRoom,id:competitionSelfId,name:competitionBoatName(),lat:pos.lat,lon:pos.lon,sog:Number(sog)||0,cog:Number(cog)||0,vmg:Number(vmg)||0,markIndex:idx,markCode:r?.code||'',markName:m?.name||'',distance:n?.dist??null,raceState,course:competitionCourseLabel(),day:$('day')?.value||'',fleet:$('fleet')?.value||'',raceSeconds:competitionRaceSeconds(),ts:Date.now(),self:true};
 }
-function competitionHostConfig(){return {type:'hostConfig',room:competitionRoom,id:competitionSelfId,course:$('course')?.value||'',day:$('day')?.value||'',fleet:$('fleet')?.value||'',route:route.map(r=>({code:r.code,round:r.round,finish:!!r.finish})),raceState,startAt:raceTimerRunning?Date.now()+raceTimerRemaining*1000:(raceStartEpoch||null),ts:Date.now()}}
+function competitionHostConfig(){return {type:'hostConfig',room:competitionRoom,id:competitionSelfId,hostName:competitionBoatName(),raceName:competitionRaceName(),course:$('course')?.value||'',day:$('day')?.value||'',fleet:$('fleet')?.value||'',route:route.map(r=>({code:r.code,round:r.round,finish:!!r.finish})),raceState,startAt:raceTimerRunning?Date.now()+raceTimerRemaining*1000:(raceStartEpoch||null),ts:Date.now()}}
+function competitionDirectoryPacket(type='raceAnnounce'){return {type,room:competitionRoom,raceName:competitionRaceName(),hostId:competitionSelfId,hostName:competitionBoatName(),course:competitionCourseLabel(),day:$('day')?.value||'',fleet:$('fleet')?.value||'',raceState,ts:Date.now(),v:38}}
 function competitionStorePacket(pkt){
  if(!pkt||pkt.id===competitionSelfId||!Number.isFinite(pkt.lat)||!Number.isFinite(pkt.lon))return;
- const prev=competitionBoats.get(pkt.id);competitionBoats.set(pkt.id,{...prev,...pkt,displayLat:prev?.displayLat??pkt.lat,displayLon:prev?.displayLon??pkt.lon,targetLat:pkt.lat,targetLon:pkt.lon,lastSeen:Date.now()});
+ const prev=competitionBoats.get(pkt.id);competitionBoats.set(pkt.id,{...prev,...pkt,displayLat:prev?.displayLat??pkt.lat,displayLon:prev?.displayLon??pkt.lon,targetLat:pkt.lat,targetLon:pkt.lon,lastSeen:Date.now()});competitionLastRelayRx=Date.now();
 }
-function competitionChannelMessage(ev){const p=ev.data||{};if(p.room!==competitionRoom)return;if(p.type==='telemetry')competitionStorePacket(p);else if(p.type==='hello'&&competitionHost)competitionSend(competitionHostConfig());else if(p.type==='hostConfig'){if($('competitionCourseStatus'))$('competitionCourseStatus').textContent=`Host · ${p.course||'—'}`;}}
-function competitionSend(payload){try{competitionChannel?.postMessage(payload)}catch(e){}}
-function competitionConnect(room,host=false){
- competitionLeave(false);competitionRoom=String(room||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8);if(!competitionRoom)return;
- competitionHost=host;try{competitionChannel=new BroadcastChannel('sparkles-fleet-'+competitionRoom);competitionChannel.onmessage=competitionChannelMessage}catch(e){competitionChannel=null}
- if($('competitionRoomCode'))$('competitionRoomCode').value=competitionRoom;
+function competitionApplyHostConfig(p){
+ competitionHostState=p;competitionLastRelayRx=Date.now();if(p.raceName&&$('competitionRaceName')&&!competitionHost)$('competitionRaceName').value=p.raceName;if($('competitionCourseStatus'))$('competitionCourseStatus').textContent=`${p.course||'—'} · host ${p.hostName||'boat'}`;
+ if(competitionHost||!Array.isArray(p.route)||!p.route.length)return;
+ const valid=p.route.every(r=>r&&marks[r.code]);if(valid){route=p.route.map(r=>({code:r.code,round:r.round||'p',finish:!!r.finish}));idx=Math.max(0,Math.min(idx,route.length-1));renderRoute();renderFullCourse();updateRaceStateBar();}
+}
+function competitionHandlePayload(p){if(!p||p.room!==competitionRoom)return;if(p.type==='telemetry')competitionStorePacket(p);else if(p.type==='hello'&&competitionHost)competitionSend(competitionHostConfig(),true);else if(p.type==='hostConfig')competitionApplyHostConfig(p);renderCompetitionAll()}
+function competitionChannelMessage(ev){competitionHandlePayload(ev.data||{})}
+async function competitionRelayPublish(topic,payload){
+ try{const r=await fetch(`${COMP_RELAY_BASE}/${encodeURIComponent(topic)}`,{method:'POST',body:JSON.stringify(payload),cache:'no-store'});if(!r.ok)throw new Error(`HTTP ${r.status}`);competitionRelayState='online';return true}catch(e){competitionRelayState='error';renderCompetitionAll();return false}
+}
+function competitionSend(payload,relay=true){try{competitionChannel?.postMessage(payload)}catch(e){}if(relay&&competitionRoom)competitionRelayPublish(competitionTopic(competitionRoom),payload)}
+function competitionParseRelayEvent(raw,handler){try{const env=JSON.parse(raw);if(env.event!=='message'||!env.message)return;const p=JSON.parse(env.message);handler(p)}catch(e){}}
+function competitionOpenRoomRelay(){
+ try{competitionRoomSocket?.close()}catch(e){}competitionRoomSocket=null;if(!competitionRoom)return;competitionRelayState='connecting';renderCompetitionAll();
+ try{const ws=new WebSocket(`${COMP_RELAY_WS}/${encodeURIComponent(competitionTopic(competitionRoom))}/ws?since=30s`);competitionRoomSocket=ws;ws.onopen=()=>{competitionRelayState='online';competitionSend({type:'hello',room:competitionRoom,id:competitionSelfId,name:competitionBoatName(),ts:Date.now()},true);competitionRelayPublish(competitionTopic(competitionRoom),competitionOwnPacket());if(competitionHost)competitionRelayPublish(competitionTopic(competitionRoom),competitionHostConfig());renderCompetitionAll()};ws.onmessage=e=>competitionParseRelayEvent(e.data,competitionHandlePayload);ws.onerror=()=>{competitionRelayState='error';renderCompetitionAll()};ws.onclose=()=>{if(competitionRoom&&competitionRelayState!=='offline'){competitionRelayState='error';renderCompetitionAll();setTimeout(()=>{if(competitionRoom&&(!competitionRoomSocket||competitionRoomSocket.readyState>1))competitionOpenRoomRelay()},5000)}}}catch(e){competitionRelayState='error';renderCompetitionAll()}
+}
+function competitionDirectoryMessage(p){
+ if(!p||!p.room)return;if(p.type==='raceClosed'){competitionAvailableRaces.delete(p.room);renderCompetitionRaceDirectory();return}if(p.type!=='raceAnnounce')return;
+ competitionAvailableRaces.set(p.room,{...competitionAvailableRaces.get(p.room),...p,seenAt:Date.now()});renderCompetitionRaceDirectory();
+}
+function renderCompetitionRaceDirectory(){
+ const sel=$('competitionAvailableRaces');if(!sel)return;const now=Date.now();for(const [room,r] of [...competitionAvailableRaces])if(now-(Number(r.ts)||r.seenAt||0)>150000)competitionAvailableRaces.delete(room);
+ const races=[...competitionAvailableRaces.values()].sort((a,b)=>(b.ts||0)-(a.ts||0));const current=sel.value;
+ sel.innerHTML=races.length?races.map(r=>{const age=Math.max(0,Math.floor((now-(r.ts||now))/1000)),label=`${r.raceName||r.room} · ${r.course||'—'} · ${r.hostName||'host'} · ${age<60?age+'s':Math.floor(age/60)+'m'} ago`;return `<option value="${esc(r.room)}">${esc(label)}</option>`}).join(''):'<option value="">No active races found</option>';
+ if(current&&races.some(r=>r.room===current))sel.value=current;if($('competitionDirectoryStatus'))$('competitionDirectoryStatus').textContent=races.length?`${races.length} active race${races.length===1?'':'s'} visible · select one and Join`:'No active race announcements in the last 2½ minutes.';
+}
+function competitionOpenDirectory(){
+ try{competitionDirectorySocket?.close()}catch(e){}competitionDirectorySocket=null;if($('competitionDirectoryStatus'))$('competitionDirectoryStatus').textContent='Internet race directory connecting…';
+ try{const ws=new WebSocket(`${COMP_RELAY_WS}/${encodeURIComponent(COMP_DIRECTORY_TOPIC)}/ws?since=10m`);competitionDirectorySocket=ws;ws.onopen=()=>{if($('competitionDirectoryStatus'))$('competitionDirectoryStatus').textContent='Race directory live · waiting for active races…'};ws.onmessage=e=>competitionParseRelayEvent(e.data,competitionDirectoryMessage);ws.onerror=()=>{if($('competitionDirectoryStatus'))$('competitionDirectoryStatus').textContent='Race directory connection failed · use Refresh to retry.'};ws.onclose=()=>{setTimeout(()=>{if(!competitionDirectorySocket||competitionDirectorySocket.readyState>1)competitionOpenDirectory()},10000)};}catch(e){if($('competitionDirectoryStatus'))$('competitionDirectoryStatus').textContent='Race directory unavailable.'}
+ renderCompetitionRaceDirectory();
+}
+function competitionRefreshRaces(){competitionAvailableRaces.clear();renderCompetitionRaceDirectory();competitionOpenDirectory()}
+function competitionAnnounceRace(){if(competitionHost&&competitionRoom)competitionRelayPublish(COMP_DIRECTORY_TOPIC,competitionDirectoryPacket('raceAnnounce'))}
+function competitionConnect(room,host=false,raceMeta=null){
+ competitionLeave(false);competitionRoom=String(room||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,10);if(!competitionRoom)return;
+ competitionHost=host;if(raceMeta?.raceName&&$('competitionRaceName'))$('competitionRaceName').value=raceMeta.raceName;
+ try{competitionChannel=new BroadcastChannel('sparkles-fleet-'+competitionRoom);competitionChannel.onmessage=competitionChannelMessage}catch(e){competitionChannel=null}
  sessionStorage.setItem('sparklesCompetitionRoom',competitionRoom);sessionStorage.setItem('sparklesCompetitionBoatName',competitionBoatName());
- competitionBroadcastTimer=setInterval(()=>{if(!competitionRoom)return;const pkt=competitionOwnPacket();competitionSend(pkt);if(competitionHost)competitionSend(competitionHostConfig());renderCompetitionAll()},1500);
- competitionSend({type:'hello',room:competitionRoom,id:competitionSelfId,name:competitionBoatName(),ts:Date.now()});
- renderCompetitionAll();startCompetitionAnimation();
+ competitionBroadcastTimer=setInterval(()=>{if(!competitionRoom)return;const pkt=competitionOwnPacket();try{competitionChannel?.postMessage(pkt)}catch(e){}renderCompetitionAll()},1500);
+ competitionRelayTimer=setInterval(()=>{if(!competitionRoom)return;competitionRelayPublish(competitionTopic(competitionRoom),competitionOwnPacket())},10000);
+ if(competitionHost){competitionAnnounceRace();competitionDirectoryTimer=setInterval(competitionAnnounceRace,45000)}
+ competitionOpenRoomRelay();renderCompetitionAll();startCompetitionAnimation();
 }
-function competitionCreateRoom(){const code=('DB'+Math.random().toString(36).slice(2,6)).toUpperCase();competitionConnect(code,true)}
-function competitionJoinRoom(){const code=$('competitionRoomCode')?.value;if(!code){alert('Enter a race room code first.');return;}competitionConnect(code,false)}
-function competitionLeave(update=true){if(competitionBroadcastTimer){clearInterval(competitionBroadcastTimer);competitionBroadcastTimer=null}try{competitionChannel?.close()}catch(e){}competitionChannel=null;competitionRoom='';competitionHost=false;competitionBoats.clear();sessionStorage.removeItem('sparklesCompetitionRoom');if(update)renderCompetitionAll();}
+function competitionCreateRoom(){const room=competitionRandomRoom();competitionConnect(room,true,{raceName:competitionRaceName()});competitionAnnounceRace();}
+function competitionJoinRoom(){const sel=$('competitionAvailableRaces'),room=sel?.value;if(!room){alert('No available race is selected. Press Refresh if another boat has just created one.');return;}const meta=competitionAvailableRaces.get(room);competitionConnect(room,false,meta);}
+function competitionLeave(update=true){
+ if(competitionHost&&competitionRoom)competitionRelayPublish(COMP_DIRECTORY_TOPIC,competitionDirectoryPacket('raceClosed'));
+ if(competitionBroadcastTimer){clearInterval(competitionBroadcastTimer);competitionBroadcastTimer=null}if(competitionRelayTimer){clearInterval(competitionRelayTimer);competitionRelayTimer=null}if(competitionDirectoryTimer){clearInterval(competitionDirectoryTimer);competitionDirectoryTimer=null}
+ try{competitionChannel?.close()}catch(e){}try{competitionRoomSocket?.close()}catch(e){}competitionChannel=null;competitionRoomSocket=null;competitionRoom='';competitionHost=false;competitionHostState=null;competitionRelayState='offline';competitionBoats.clear();sessionStorage.removeItem('sparklesCompetitionRoom');if(update)renderCompetitionAll();
+}
 function competitionDemoPath(){
  const pts=[];const ep=getStartLineEndpoints();if(ep)pts.push(midpointGeo(ep.a,ep.b));else pts.push({lat:pos.lat,lon:pos.lon});route.forEach(r=>{const m=marks[r.code];if(m&&Number.isFinite(m.lat)&&Number.isFinite(m.lon))pts.push(m)});return pts.length>1?pts:[{lat:pos.lat,lon:pos.lon},{lat:pos.lat+.004,lon:pos.lon+.004}];
 }
@@ -1180,14 +1234,16 @@ function competitionFitCourse(){const pts=route.map(r=>marks[r.code]?chartXY(mar
 function competitionFitFleet(){const pts=competitionFleetList().map(b=>chartXYGeo({lat:b.displayLat??b.lat,lon:b.displayLon??b.lon}));if(pts.length)competitionFitPoints(pts);else competitionFitCourse()}
 function competitionResetZoom(){const vp=$('competitionMapViewport');if(!vp)return;const r=vp.getBoundingClientRect(),sc=Math.min(r.width/945,r.height/1280);competitionZoom={scale:sc,x:(r.width-945*sc)/2,y:(r.height-1280*sc)/2};competitionSetTransform()}
 function initCompetitionPanZoom(){const vp=$('competitionMapViewport');if(!vp||vp.dataset.ready)return;vp.dataset.ready='1';let drag=null;vp.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,ox:competitionZoom.x,oy:competitionZoom.y};vp.setPointerCapture?.(e.pointerId);vp.classList.add('dragging')});vp.addEventListener('pointermove',e=>{if(!drag)return;competitionZoom.x=drag.ox+e.clientX-drag.x;competitionZoom.y=drag.oy+e.clientY-drag.y;competitionSetTransform()});const end=()=>{drag=null;vp.classList.remove('dragging')};vp.addEventListener('pointerup',end);vp.addEventListener('pointercancel',end);vp.addEventListener('wheel',e=>{e.preventDefault();const r=vp.getBoundingClientRect();competitionZoomAt(e.deltaY<0?1.15:.87,e.clientX-r.left,e.clientY-r.top)},{passive:false});competitionResetZoom()}
-function initCompetitionUI(){if($('competitionMapImage')){const img=document.querySelector('.chart-map img');if(img)$('competitionMapImage').src=img.src}if($('competitionBoatName'))$('competitionBoatName').value=sessionStorage.getItem('sparklesCompetitionBoatName')||'Prospect';const room=sessionStorage.getItem('sparklesCompetitionRoom');if(room&&$('competitionRoomCode'))$('competitionRoomCode').value=room;initCompetitionPanZoom();renderCompetitionAll();startCompetitionAnimation()}
+function initCompetitionUI(){if($('competitionMapImage')){const img=document.querySelector('.chart-map img');if(img)$('competitionMapImage').src=img.src}if($('competitionBoatName'))$('competitionBoatName').value=sessionStorage.getItem('sparklesCompetitionBoatName')||'Prospect';initCompetitionPanZoom();competitionOpenDirectory();renderCompetitionAll();startCompetitionAnimation()}
 function renderCompetitionAll(){
- const active=!!competitionRoom||competitionDemo,banner=$('competitionLiveBanner');if(banner)banner.classList.toggle('live',active);
- if($('competitionConnection'))$('competitionConnection').textContent=competitionDemo?(competitionRoom?'ROOM + DEMO':'DEMO LIVE'):(competitionRoom?'ROOM LIVE':'OFFLINE');
- if($('competitionConnectionDetail'))$('competitionConnectionDetail').textContent=competitionRoom?`${competitionHost?'Host':'Joined'} · ${competitionRoom} · local trial link`:(competitionDemo?'Animated fleet simulation · no network required':'Create or join a trial room, or start the demo fleet.');
- if($('competitionRoomStatus'))$('competitionRoomStatus').textContent=competitionRoom||'—';if($('competitionCourseStatus'))$('competitionCourseStatus').textContent=competitionCourseLabel();
- let clock='—';if(raceState==='PRESTART')clock=`T−${formatTimer(raceTimerRemaining)}`;else if(raceState==='RACING')clock=formatElapsedSeconds(competitionRaceSeconds());if($('competitionClockStatus'))$('competitionClockStatus').textContent=clock;
- renderCompetitionTable();renderCompetitionMap();
+ const active=!!competitionRoom||competitionDemo,banner=$('competitionLiveBanner');if(banner)banner.classList.toggle('live',active&&competitionRelayState!=='error');
+ let conn='OFFLINE',detail='Select an available race, create one, or start the demo fleet.';
+ if(competitionDemo&&!competitionRoom){conn='DEMO LIVE';detail='Animated fleet simulation · no network required'}
+ if(competitionRoom){conn=competitionRelayState==='online'?'INTERNET LIVE':competitionRelayState==='connecting'?'CONNECTING…':competitionRelayState==='error'?'RELAY ERROR':'LOCAL ONLY';detail=`${competitionHost?'Hosting':'Joined'} · ${competitionRoom} · ${competitionRelayState==='online'?'internet relay connected':'local navigation unaffected'}`;if(competitionDemo)conn+=' + DEMO'}
+ if($('competitionConnection'))$('competitionConnection').textContent=conn;if($('competitionConnectionDetail'))$('competitionConnectionDetail').textContent=detail;
+ if($('competitionRoomStatus'))$('competitionRoomStatus').textContent=competitionRoom?(competitionRaceName()+' · '+competitionRoom):'—';if($('competitionCourseStatus'))$('competitionCourseStatus').textContent=competitionHostState&&!competitionHost?`${competitionHostState.course||'—'} · shared`:competitionCourseLabel();
+ let clock='—';if(competitionHostState?.startAt&&!competitionHost){const d=competitionHostState.startAt-Date.now();clock=d>0?`T−${formatTimer(d/1000)}`:formatElapsedSeconds((-d)/1000)}else if(raceState==='PRESTART')clock=`T−${formatTimer(raceTimerRemaining)}`;else if(raceState==='RACING')clock=formatElapsedSeconds(competitionRaceSeconds());if($('competitionClockStatus'))$('competitionClockStatus').textContent=clock;
+ renderCompetitionTable();renderCompetitionMap();renderCompetitionRaceDirectory();
 }
 
 const PROSPECT_WARNING_TIMES={Thursday:'18:45',Saturday:'14:10'};
@@ -2321,9 +2377,9 @@ maybeCallTimer=function(){
 function updateRaceLifecycle(){
   if(raceTimerRunning&&raceState!=='RACING'&&raceState!=='FINISHED'){if(raceState!=='PRESTART'){raceState='PRESTART';lockRaceSession();}if(raceTimerRemaining<=300&&!preStartCaptureStarted){if(tracker.finished&&tracker.points.length)clearTracker(false);if(!tracker.running)startTracker();preStartCaptureStarted=true;}if(raceTimerRemaining<=0){raceState='RACING';preStartCaptureStarted=true;if(!raceStartEpoch)raceStartEpoch=Date.now();saveRaceSession();}}updateRaceStateBar();renderPreStart();
 }
-const _startRaceTimerV27=startRaceTimer;startRaceTimer=function(){if(tracker.finished&&tracker.points.length&&raceState==='SETUP'){if(!confirm('Start a new race session? The currently saved finished track will be cleared. Export it first if needed.'))return;clearTracker(false);}raceState='PRESTART';lockRaceSession();_startRaceTimerV27();updateRaceLifecycle();};
+const _startRaceTimerV27=startRaceTimer;startRaceTimer=function(){if(tracker.finished&&tracker.points.length&&raceState==='SETUP'){if(!confirm('Start a new race session? The currently saved finished track will be cleared. Export it first if needed.'))return;clearTracker(false);}raceState='PRESTART';lockRaceSession();_startRaceTimerV27();updateRaceLifecycle();if(competitionHost&&competitionRoom)competitionSend(competitionHostConfig());};
 const _resetRaceTimerV27=resetRaceTimer;resetRaceTimer=function(){_resetRaceTimerV27();if(raceState!=='RACING'){raceState='SETUP';preStartCaptureStarted=false;raceStartEpoch=null;}updateRaceStateBar();renderPreStart();};
-function startRaceNow(){if(tracker.finished&&tracker.points.length){if(!confirm('Start a new race and clear the previous finished track?'))return;clearTracker(false);}lockRaceSession();raceState='RACING';raceStartEpoch=Date.now();raceTimerRemaining=0;raceTimerRunning=false;clearInterval(raceTimerId);raceTimerId=null;if(!tracker.running)startTracker();preStartCaptureStarted=true;renderTimer();speakSailing('Start');playStartHooter();saveRaceSession();updateRaceStateBar();}
+function startRaceNow(){if(tracker.finished&&tracker.points.length){if(!confirm('Start a new race and clear the previous finished track?'))return;clearTracker(false);}lockRaceSession();raceState='RACING';raceStartEpoch=Date.now();raceTimerRemaining=0;raceTimerRunning=false;clearInterval(raceTimerId);raceTimerId=null;if(!tracker.running)startTracker();preStartCaptureStarted=true;renderTimer();speakSailing('Start');playStartHooter();saveRaceSession();updateRaceStateBar();if(competitionHost&&competitionRoom)competitionSend(competitionHostConfig());}
 useGPS=function(){gpsWanted=true;requestWakeLock();startGPSWatch();updateRaceStateBar();};
 function syncTimerToSchedule(){$('timerPreset').value='5';if($('manualTimerWrap'))$('manualTimerWrap').style.display='none';raceTimerRemaining=300;raceTimerRunning=false;clearInterval(raceTimerId);raceTimerId=null;timerLastCall=null;renderTimer();updateRaceStateBar();}
 
@@ -2397,9 +2453,11 @@ if($('openFreestyleBtn'))$('openFreestyleBtn').onclick=()=>openTab('freestyle');
 if($('openCompetitionBtn'))$('openCompetitionBtn').onclick=()=>openTab('competition');
 if($('competitionCreateBtn'))$('competitionCreateBtn').onclick=competitionCreateRoom;
 if($('competitionJoinBtn'))$('competitionJoinBtn').onclick=competitionJoinRoom;
+if($('competitionRefreshRacesBtn'))$('competitionRefreshRacesBtn').onclick=competitionRefreshRaces;
 if($('competitionLeaveBtn'))$('competitionLeaveBtn').onclick=()=>competitionLeave(true);
 if($('competitionDemoBtn'))$('competitionDemoBtn').onclick=competitionStartDemo;
 if($('competitionBoatName'))$('competitionBoatName').onchange=()=>{sessionStorage.setItem('sparklesCompetitionBoatName',competitionBoatName());renderCompetitionAll()};
+if($('competitionRaceName'))$('competitionRaceName').onchange=()=>{if(competitionHost)competitionAnnounceRace();renderCompetitionAll()};
 if($('fleetZoomIn'))$('fleetZoomIn').onclick=()=>competitionZoomAt(1.25);
 if($('fleetZoomOut'))$('fleetZoomOut').onclick=()=>competitionZoomAt(.8);
 if($('fleetZoomFit'))$('fleetZoomFit').onclick=competitionFitCourse;
