@@ -332,7 +332,7 @@ body{touch-action:pan-x pan-y}
 @media(max-width:700px){.freestyle-builder-grid,.freestyle-start-fields,.freestyle-finish-fields,.freestyle-summary{grid-template-columns:1fr}.freestyle-course{min-width:650px}.freestyle-active-banner{align-items:flex-start;flex-direction:column}}
 
 
-/* v38 Competition / Fleet internet trial */
+/* v39 Competition / Fleet internet trial */
 .competition-hint{display:none;margin-top:12px;padding:12px;border:1px solid #365365;border-radius:12px;background:#081821}
 .competition-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .competition-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}
@@ -356,7 +356,7 @@ body{touch-action:pan-x pan-y}
 .relay-public-note{border-left:3px solid #ffb04a;padding-left:10px}
 @media(max-width:700px){.available-races-grid{grid-template-columns:1fr}}
 
-</style></head><body><header class="topbar"><div class="brandrow"><div class="brand"><h1>⛵ SparklesGPT</h1><small>DBSC 2026 Browser Sailing App · v38</small></div><div class="topstatus"><span class="mini" id="clock">--:--</span><span class="mini">GPS <b id="gpsStatus">Idle</b></span><span class="mini">Wind <b id="weatherStatus">—</b></span><span class="mini">Course <b id="courseStatus">—</b></span></div></div><nav class="tabs">
+</style></head><body><header class="topbar"><div class="brandrow"><div class="brand"><h1>⛵ SparklesGPT</h1><small>DBSC 2026 Browser Sailing App · v39</small></div><div class="topstatus"><span class="mini" id="clock">--:--</span><span class="mini">GPS <b id="gpsStatus">Idle</b></span><span class="mini">Wind <b id="weatherStatus">—</b></span><span class="mini">Course <b id="courseStatus">—</b></span></div></div><nav class="tabs">
 <button class="tab-btn active" data-tab="selection">Course Selection</button>
 <button class="tab-btn" data-tab="startmarks">Start &amp; Marks</button>
 <button class="tab-btn" data-tab="freestyle">Freestyle / Coastal</button>
@@ -538,7 +538,7 @@ body{touch-action:pan-x pan-y}
       <div class="statuscard"><small>Shared course</small><b id="competitionCourseStatus">—</b></div>
       <div class="statuscard"><small>Shared clock</small><b id="competitionClockStatus">—</b></div>
     </div>
-    <p class="note relay-public-note" style="margin-top:12px">v38 uses a public ntfy.sh relay for this trial, so a phone and laptop on different connections can share a race without installing a server. Race announcements and fleet packets are temporary trial data and are not private. Normal GPS navigation and race recording remain local and continue if the relay drops.</p>
+    <p class="note relay-public-note" style="margin-top:12px">v39 uses a public ntfy.sh relay for this trial, so a phone and laptop on different connections can share a race without installing a server. Race announcements and fleet packets are temporary trial data and are not private. Normal GPS navigation and race recording remain local and continue if the relay drops.</p>
   </div>
   <div class="panel">
     <h2>Live Fleet Map</h2>
@@ -1130,7 +1130,7 @@ function updateRaceTypeUI(){
 
 
 
-/* v38 Competition / Fleet internet trial */
+/* v39 Competition / Fleet internet trial */
 let competitionChannel=null,competitionRoomSocket=null,competitionDirectorySocket=null,competitionRoom='',competitionHost=false,competitionDemo=false,competitionDemoTimer=null,competitionBroadcastTimer=null,competitionRelayTimer=null,competitionDirectoryTimer=null,competitionAnimFrame=null;
 let competitionBoats=new Map(),competitionAvailableRaces=new Map(),competitionHostState=null;
 let competitionZoom={scale:1,x:0,y:0};
@@ -1139,20 +1139,23 @@ const competitionSelfId=sessionStorage.getItem('sparklesCompetitionBoatId')||('b
 const COMP_COLOURS=['#ff8a3d','#55b8ff','#d87cff','#ffd541','#6de0b1','#ff6f91'];
 const COMP_RELAY_BASE='https://ntfy.sh';
 const COMP_RELAY_WS='wss://ntfy.sh';
-const COMP_DIRECTORY_TOPIC='sparklesgpt-dbsc-races-2026-v38-7f91c2e8';
+const COMP_DIRECTORY_TOPIC='sparklesgpt-dbsc-races-2026-v39-7f91c2e8';
 function competitionBoatName(){return ($('competitionBoatName')?.value||'Prospect').trim()||'Prospect'}
 function competitionCourseLabel(){return isFreestyle()?'Freestyle':($('course')?.value||'—')}
 function competitionRaceName(){const typed=($('competitionRaceName')?.value||'').trim();return typed||`${$('day')?.value||'DBSC'} · ${$('fleet')?.value||'Fleet'} · ${competitionCourseLabel()}`}
-function competitionRaceSeconds(){return raceStartEpoch?Math.max(0,(Date.now()-raceStartEpoch)/1000):(raceState==='PRESTART'?Math.max(0,300-raceTimerRemaining):0)}
+let competitionRaceFinishSeconds=null;
+function validRaceStartEpoch(t){const n=Number(t),age=Date.now()-n;return Number.isFinite(n)&&n>0&&age>=-10000&&age<=12*3600*1000}
+function competitionRaceSeconds(){if(raceState==='FINISHED'&&Number.isFinite(competitionRaceFinishSeconds))return Math.max(0,competitionRaceFinishSeconds);return raceState==='RACING'&&validRaceStartEpoch(raceStartEpoch)?Math.max(0,(Date.now()-raceStartEpoch)/1000):0}
+function competitionSharedStartAt(){if(raceState==='PRESTART'&&Number.isFinite(raceTimerRemaining))return Date.now()+Math.max(0,raceTimerRemaining)*1000;if((raceState==='RACING'||raceState==='FINISHED')&&validRaceStartEpoch(raceStartEpoch))return raceStartEpoch;return null}
 function formatElapsedSeconds(sec){sec=Math.max(0,Math.floor(Number(sec)||0));const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;return h?`${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`:`${m}:${String(s).padStart(2,'0')}`}
 function competitionRandomRoom(){try{const a=new Uint8Array(5);crypto.getRandomValues(a);return 'DB'+Array.from(a,x=>(x%36).toString(36)).join('').toUpperCase()}catch(e){return ('DB'+Math.random().toString(36).slice(2,7)).toUpperCase()}}
-function competitionTopic(room){return `sparklesgpt-dbsc-race-v38-${String(room||'').toLowerCase()}`}
+function competitionTopic(room){return `sparklesgpt-dbsc-race-v39-${String(room||'').toLowerCase()}`}
 function competitionOwnPacket(){
  const r=route[idx],m=r&&marks[r.code],n=m?nav(pos,m):null,vmg=n?sog*Math.cos(rad(delta(cog,n.bearing))):0;
  return {type:'telemetry',room:competitionRoom,id:competitionSelfId,name:competitionBoatName(),lat:pos.lat,lon:pos.lon,sog:Number(sog)||0,cog:Number(cog)||0,vmg:Number(vmg)||0,markIndex:idx,markCode:r?.code||'',markName:m?.name||'',distance:n?.dist??null,raceState,course:competitionCourseLabel(),day:$('day')?.value||'',fleet:$('fleet')?.value||'',raceSeconds:competitionRaceSeconds(),ts:Date.now(),self:true};
 }
-function competitionHostConfig(){return {type:'hostConfig',room:competitionRoom,id:competitionSelfId,hostName:competitionBoatName(),raceName:competitionRaceName(),course:$('course')?.value||'',day:$('day')?.value||'',fleet:$('fleet')?.value||'',route:route.map(r=>({code:r.code,round:r.round,finish:!!r.finish})),raceState,startAt:raceTimerRunning?Date.now()+raceTimerRemaining*1000:(raceStartEpoch||null),ts:Date.now()}}
-function competitionDirectoryPacket(type='raceAnnounce'){return {type,room:competitionRoom,raceName:competitionRaceName(),hostId:competitionSelfId,hostName:competitionBoatName(),course:competitionCourseLabel(),day:$('day')?.value||'',fleet:$('fleet')?.value||'',raceState,ts:Date.now(),v:38}}
+function competitionHostConfig(){return {type:'hostConfig',room:competitionRoom,id:competitionSelfId,hostName:competitionBoatName(),raceName:competitionRaceName(),course:$('course')?.value||'',day:$('day')?.value||'',fleet:$('fleet')?.value||'',route:route.map(r=>({code:r.code,round:r.round,finish:!!r.finish})),raceState,startAt:competitionSharedStartAt(),raceSeconds:competitionRaceSeconds(),ts:Date.now()}}
+function competitionDirectoryPacket(type='raceAnnounce'){return {type,room:competitionRoom,raceName:competitionRaceName(),hostId:competitionSelfId,hostName:competitionBoatName(),course:competitionCourseLabel(),day:$('day')?.value||'',fleet:$('fleet')?.value||'',raceState,ts:Date.now(),v:39}}
 function competitionStorePacket(pkt){
  if(!pkt||pkt.id===competitionSelfId||!Number.isFinite(pkt.lat)||!Number.isFinite(pkt.lon))return;
  const prev=competitionBoats.get(pkt.id);competitionBoats.set(pkt.id,{...prev,...pkt,displayLat:prev?.displayLat??pkt.lat,displayLon:prev?.displayLon??pkt.lon,targetLat:pkt.lat,targetLon:pkt.lon,lastSeen:Date.now()});competitionLastRelayRx=Date.now();
@@ -1200,7 +1203,7 @@ function competitionConnect(room,host=false,raceMeta=null){
  if(competitionHost){competitionAnnounceRace();competitionDirectoryTimer=setInterval(competitionAnnounceRace,45000)}
  competitionOpenRoomRelay();renderCompetitionAll();startCompetitionAnimation();
 }
-function competitionCreateRoom(){const room=competitionRandomRoom();competitionConnect(room,true,{raceName:competitionRaceName()});competitionAnnounceRace();}
+function competitionCreateRoom(){const room=competitionRandomRoom();if(raceState==='SETUP'){competitionRaceFinishSeconds=null;if(!validRaceStartEpoch(raceStartEpoch))raceStartEpoch=null;}competitionConnect(room,true,{raceName:competitionRaceName()});competitionAnnounceRace();}
 function competitionJoinRoom(){const sel=$('competitionAvailableRaces'),room=sel?.value;if(!room){alert('No available race is selected. Press Refresh if another boat has just created one.');return;}const meta=competitionAvailableRaces.get(room);competitionConnect(room,false,meta);}
 function competitionLeave(update=true){
  if(competitionHost&&competitionRoom)competitionRelayPublish(COMP_DIRECTORY_TOPIC,competitionDirectoryPacket('raceClosed'));
@@ -1242,7 +1245,10 @@ function renderCompetitionAll(){
  if(competitionRoom){conn=competitionRelayState==='online'?'INTERNET LIVE':competitionRelayState==='connecting'?'CONNECTING…':competitionRelayState==='error'?'RELAY ERROR':'LOCAL ONLY';detail=`${competitionHost?'Hosting':'Joined'} · ${competitionRoom} · ${competitionRelayState==='online'?'internet relay connected':'local navigation unaffected'}`;if(competitionDemo)conn+=' + DEMO'}
  if($('competitionConnection'))$('competitionConnection').textContent=conn;if($('competitionConnectionDetail'))$('competitionConnectionDetail').textContent=detail;
  if($('competitionRoomStatus'))$('competitionRoomStatus').textContent=competitionRoom?(competitionRaceName()+' · '+competitionRoom):'—';if($('competitionCourseStatus'))$('competitionCourseStatus').textContent=competitionHostState&&!competitionHost?`${competitionHostState.course||'—'} · shared`:competitionCourseLabel();
- let clock='—';if(competitionHostState?.startAt&&!competitionHost){const d=competitionHostState.startAt-Date.now();clock=d>0?`T−${formatTimer(d/1000)}`:formatElapsedSeconds((-d)/1000)}else if(raceState==='PRESTART')clock=`T−${formatTimer(raceTimerRemaining)}`;else if(raceState==='RACING')clock=formatElapsedSeconds(competitionRaceSeconds());if($('competitionClockStatus'))$('competitionClockStatus').textContent=clock;
+ let clock='WAITING';
+ if(competitionHostState&&!competitionHost){const hs=competitionHostState.raceState||'SETUP',start=Number(competitionHostState.startAt),d=start-Date.now();if(hs==='PRESTART'&&Number.isFinite(start)&&d>-10000&&d<2*3600*1000)clock=`T−${formatTimer(Math.max(0,d/1000))}`;else if(hs==='RACING'&&validRaceStartEpoch(start))clock=formatElapsedSeconds((Date.now()-start)/1000);else if(hs==='FINISHED')clock=Number.isFinite(Number(competitionHostState.raceSeconds))?formatElapsedSeconds(Number(competitionHostState.raceSeconds)):'FINISHED';else clock='WAITING';}
+ else if(raceState==='PRESTART')clock=`T−${formatTimer(raceTimerRemaining)}`;else if(raceState==='RACING')clock=validRaceStartEpoch(raceStartEpoch)?formatElapsedSeconds(competitionRaceSeconds()):'WAITING';else if(raceState==='FINISHED')clock=Number.isFinite(competitionRaceFinishSeconds)?formatElapsedSeconds(competitionRaceFinishSeconds):'FINISHED';
+ if($('competitionClockStatus'))$('competitionClockStatus').textContent=clock;
  renderCompetitionTable();renderCompetitionMap();renderCompetitionRaceDirectory();
 }
 
@@ -2314,7 +2320,10 @@ function restoreRaceSession(){
 function confirmSessionChange(){if(!(raceState==='PRESTART'||raceState==='RACING'))return true;return confirm(`Course ${courseDisplayName()} is locked for this race. Change the active race setup?`)}
 function prepareCollapsiblePanels(){document.querySelectorAll('.tab-panel .panel').forEach((p)=>{if(p.querySelector('.collapse-btn'))return;const b=document.createElement('button');b.type='button';b.className='secondary collapse-btn';b.textContent='−';b.setAttribute('aria-label','Minimize or expand section');b.onclick=()=>{p.classList.toggle('collapsed');b.textContent=p.classList.contains('collapsed')?'+':'−'};p.appendChild(b);});}
 
+let startLineMotionSamples=[],startLineSmoothedClosureMps=null,startLineFallbackSide=null,startLineGuidanceState='HOLD',startLineWasOver=false;
+function resetStartLineForecastTracking(){startLineMotionSamples=[];startLineSmoothedClosureMps=null;startLineFallbackSide=null;startLineGuidanceState='HOLD';startLineWasOver=false}
 function getStartLineEndpoints(){const pin=startLine.hut;if(selectedIsHutStart())return pin?{a:HUT_FIXED,b:pin}:null;return startLine.committee&&pin?{a:startLine.committee,b:pin}:null;}
+
 function pingStartEnd(which){
   if($('gpsStatus')?.textContent!=='Live'){
     alert('Start live GPS first, then ping the start-line end with the bow at the intended line-end reference.');
@@ -2323,6 +2332,7 @@ function pingStartEnd(which){
   const heading=navReferenceHeading(),corr=deviceAftOfBowM(),bow=estimatedBowPosition(pos);
   const point={lat:bow.lat,lon:bow.lon,time:Date.now(),accuracy:null,rawLat:pos.lat,rawLon:pos.lon,bowCorrectionM:corr,headingUsed:heading,devicePosition:$('devicePosition')?.value||'middle'};
   if(which==='committee')startLine.committee=point;else startLine.hut=point;
+  resetStartLineForecastTracking();
   saveStartLine();renderStartLinePanel();renderMap();renderFreestyleStartStatus();renderFreestyleFinishStatus();if(isFreestyle()&&($('freeStartType')?.value==='committee'||$('freeFinishType')?.value==='committee'))activateFreestyleCourse(false);
 }
 
@@ -2339,14 +2349,33 @@ renderStartLinePanel=function(){
   $('startLineGeometry').textContent=`${String(Math.round(a.bearing)).padStart(3,'0')}° · ${(a.lengthNm*1852).toFixed(0)} m`;$('startLineBias').textContent=a.favoured==='NEARLY SQUARE'?'LINE NEARLY SQUARE':`${a.favoured} FAVOURED`;$('startLineBias').style.color=a.favoured==='PIN'?'var(--starboard)':'var(--accent)';$('startLineBiasDetail').textContent=`~${a.angle.toFixed(1)}° off square · approximately ${a.biasM.toFixed(0)} m end-to-end bias.`;
 };
 
+function startLineTrendClosureMps(samples){
+  if(samples.length<3)return null;const t0=samples[0].t;let sw=0,sx=0,sy=0,sxx=0,sxy=0;const n=samples.length;
+  samples.forEach((p,i)=>{const x=(p.t-t0)/1000,y=p.d,w=.35+.65*(i/Math.max(1,n-1));sw+=w;sx+=w*x;sy+=w*y;sxx+=w*x*x;sxy+=w*x*y;});
+  const den=sw*sxx-sx*sx;if(Math.abs(den)<1e-6)return null;const slope=(sw*sxy-sx*sy)/den;return -slope;
+}
 function startLineForecast(){
   const ep=getStartLineEndpoints();if(!ep||!gpsWanted)return null;const lat0=rad((ep.a.lat+ep.b.lat+pos.lat)/3),kx=60*Math.cos(lat0),ky=60;
-  const A={x:ep.a.lon*kx,y:ep.a.lat*ky},B={x:ep.b.lon*kx,y:ep.b.lat*ky};const bow=estimatedBowPosition(pos);let P={x:bow.lon*kx,y:bow.lat*ky};
-  const vx=B.x-A.x,vy=B.y-A.y,len=Math.hypot(vx,vy);if(!len)return null;const nx=-vy/len,ny=vx/len;const signed=(P.x-A.x)*nx+(P.y-A.y)*ny;const speedNmSec=sog/3600,vxBoat=speedNmSec*Math.sin(rad(cog)),vyBoat=speedNmSec*Math.cos(rad(cog)),closure=-(vxBoat*nx+vyBoat*ny);
-  const crossSec=closure>0.000001?Math.abs(signed)/closure:null,distM=Math.abs(signed)*1852;const deltaSec=Number.isFinite(crossSec)?crossSec-raceTimerRemaining:null;let guidance='HOLD';if(Number.isFinite(deltaSec)){guidance=deltaSec>2?'SPEED UP':deltaSec<-2?'SLOW DOWN':'ON TIME'}
-  return {distM,crossSec,deltaSec,guidance};
+  const A={x:ep.a.lon*kx,y:ep.a.lat*ky},B={x:ep.b.lon*kx,y:ep.b.lat*ky};const bow=estimatedBowPosition(pos),P={x:bow.lon*kx,y:bow.lat*ky};
+  const vx=B.x-A.x,vy=B.y-A.y,len=Math.hypot(vx,vy);if(!len)return null;const nx=-vy/len,ny=vx/len,rawSigned=(P.x-A.x)*nx+(P.y-A.y)*ny;
+  let side=null;const first=route.find(r=>!r.finish&&marks[r.code]);if(first){const fm=marks[first.code],Q={x:fm.lon*kx,y:fm.lat*ky},markSigned=(Q.x-A.x)*nx+(Q.y-A.y)*ny;if(Math.abs(markSigned)*1852>3)side=markSigned>0?-1:1;}
+  if(side===null){if(startLineFallbackSide===null&&Math.abs(rawSigned)*1852>2)startLineFallbackSide=rawSigned>=0?1:-1;side=startLineFallbackSide||1;}
+  const signedNm=rawSigned*side,distM=signedNm*1852,along=((P.x-A.x)*vx+(P.y-A.y)*vy)/(len*len),now=Date.now();let added=false;
+  const last=startLineMotionSamples[startLineMotionSamples.length-1];if(!last||(now-last.t>=400&&Math.abs(distM-last.d)>.05)||now-last.t>=1500){startLineMotionSamples.push({t:now,d:distM});startLineMotionSamples=startLineMotionSamples.filter(p=>now-p.t<=8000);added=true;}
+  const trend=startLineTrendClosureMps(startLineMotionSamples),speedNmSec=sog/3600,vxBoat=speedNmSec*Math.sin(rad(cog)),vyBoat=speedNmSec*Math.cos(rad(cog)),instantClosure=(-(vxBoat*nx+vyBoat*ny)*side)*1852;
+  const candidate=Number.isFinite(trend)?trend:instantClosure;if(added&&Number.isFinite(candidate))startLineSmoothedClosureMps=startLineSmoothedClosureMps===null?candidate:(.35*candidate+.65*startLineSmoothedClosureMps);
+  const closureMps=Number.isFinite(startLineSmoothedClosureMps)?startLineSmoothedClosureMps:instantClosure,crossSec=distM>0&&closureMps>.05?distM/closureMps:null,deltaSec=Number.isFinite(crossSec)?crossSec-raceTimerRemaining:null;
+  let guidance='HOLD';if(distM<-.75)guidance='OVER LINE · RETURN';else if(Number.isFinite(deltaSec)){if(startLineGuidanceState==='SPEED UP'&&deltaSec>1)guidance='SPEED UP';else if(startLineGuidanceState==='SLOW DOWN'&&deltaSec<-1)guidance='SLOW DOWN';else guidance=deltaSec>3?'SPEED UP':deltaSec<-3?'SLOW DOWN':'ON TIME';}startLineGuidanceState=guidance;
+  return {distM,crossSec,deltaSec,guidance,closureMps,overLine:distM<-.75,onSegment:along>=0&&along<=1,along};
 }
-function renderPreStart(){const f=startLineForecast();if($('preStartCountdown'))$('preStartCountdown').textContent=raceTimerRunning||raceState==='PRESTART'?formatTimer(raceTimerRemaining):'—';if(!f){if($('preStartLineDist'))$('preStartLineDist').textContent='—';if($('preStartProjection'))$('preStartProjection').textContent='—';if($('preStartGuidance'))$('preStartGuidance').textContent='GPS / line required';return;}if($('preStartLineDist'))$('preStartLineDist').textContent=`${Math.round(f.distM)} m`;if($('preStartProjection'))$('preStartProjection').textContent=Number.isFinite(f.deltaSec)?`${Math.abs(f.deltaSec).toFixed(0)} s ${f.deltaSec>2?'late':f.deltaSec<-2?'early':'on time'}`:'No crossing';if($('preStartGuidance'))$('preStartGuidance').textContent=f.guidance;}
+function renderPreStart(){
+  const f=startLineForecast();if($('preStartCountdown'))$('preStartCountdown').textContent=raceTimerRunning||raceState==='PRESTART'?formatTimer(raceTimerRemaining):'—';
+  if(!f){if($('preStartLineDist')){$('preStartLineDist').textContent='—';$('preStartLineDist').style.color=''}if($('preStartProjection'))$('preStartProjection').textContent='—';if($('preStartGuidance'))$('preStartGuidance').textContent='GPS / line required';return;}
+  const over=f.overLine;if($('preStartLineDist')){$('preStartLineDist').textContent=`${f.distM<0?'−':''}${Math.abs(Math.round(f.distM))} m`;$('preStartLineDist').style.color=over?'var(--red)':'';}
+  if($('preStartProjection'))$('preStartProjection').textContent=over?'COURSE SIDE':Number.isFinite(f.deltaSec)?`${Math.abs(f.deltaSec).toFixed(0)} ${f.deltaSec>3?'late':f.deltaSec<-3?'early':'on time'}`:'No crossing';
+  if($('preStartGuidance')){$('preStartGuidance').textContent=f.guidance;$('preStartGuidance').style.color=over?'var(--red)':'';}
+  if(raceState==='PRESTART'&&over&&!startLineWasOver)speakSailing('Over line. Return.');startLineWasOver=over;
+}
 
 function bestSailingVoice(){if(!('speechSynthesis' in window))return null;const vs=speechSynthesis.getVoices()||[];return vs.find(v=>/^en-GB/i.test(v.lang)&&/natural|google|sonia|ryan|daniel/i.test(v.name))||vs.find(v=>/^en-GB/i.test(v.lang))||vs.find(v=>/^en/i.test(v.lang))||vs[0]||null;}
 function speakDirect(text){
@@ -2370,18 +2399,20 @@ function announceActiveMarkChange(){
 
 function repeatCurrentNavigation(){speakDirect(navigationVoicePhrase());}
 function speakSailing(text){if($('voiceMode')?.value==='off'||!('speechSynthesis' in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);const v=bestSailingVoice();if(v)u.voice=v;u.lang=v?.lang||'en-GB';u.rate=1.15;u.pitch=1;speechSynthesis.speak(u);if($('voiceStatus'))$('voiceStatus').textContent=text;}catch(e){}}
-function startVoicePhrase(sec){const f=startLineForecast();if(sec<=0)return 'Start';if(!f)return `${sec} seconds`;if(sec<=20){const timing=Number.isFinite(f.deltaSec)?(Math.abs(f.deltaSec)<=2?'on time':`${Math.abs(Math.round(f.deltaSec))} seconds ${f.deltaSec>0?'late':'early'}`):'';return `${sec} seconds. ${Math.round(f.distM)} metres. ${timing}. ${f.guidance==='HOLD'?'Hold':f.guidance.toLowerCase()}.`;}return `${sec} seconds. ${Math.round(f.distM)} metres to line. ${f.guidance==='HOLD'?'Hold':f.guidance.toLowerCase()}.`; }
+function compactCountdownTime(sec){const s=Math.round(sec);if(s===300)return 'Five minutes';if(s===60)return 'One minute';if(s>60&&s%30===0){const m=Math.floor(s/60),r=s%60;return r?`${m} thirty`:`${m} minutes`;}return String(s)}
+function startVoicePhrase(sec){const s=Math.round(sec),f=startLineForecast(),base=compactCountdownTime(s);if(s<=0)return 'Start';if(!f)return base;if(f.overLine&&s>=10)return `${base}. Over line. Return.`;if([30,20,10].includes(s)){const bits=[base];if(Math.abs(f.distM)<=100)bits.push(`${Math.abs(Math.round(f.distM))} metres`);if(Number.isFinite(f.deltaSec)&&Math.abs(f.deltaSec)>3)bits.push(`${Math.abs(Math.round(f.deltaSec))} ${f.deltaSec>0?'late':'early'}`);return bits.join('. ')+'.';}return base;}
+function timerCallForV39(sec){const s=Math.ceil(sec);if(s===0)return 0;if(s>=1&&s<=10)return s;if([15,20,25,30,40,50,60].includes(s))return s;if(s>60&&s<=300&&s%30===0)return s;return null}
 maybeCallTimer=function(){
-  const s=Math.ceil(raceTimerRemaining);updateRaceLifecycle();let call=null;if(s===0)call=0;else if(s<=20&&s%2===0)call=s;else if(s>20&&s<=300&&s%5===0)call=s;if(call===null||call===timerLastCall)return;timerLastCall=call;if(call===0){speakSailing('Start');playStartHooter();if(navigator.vibrate)navigator.vibrate([250,120,250,120,500]);}else{speakSailing(startVoicePhrase(call));if(navigator.vibrate&&call<=10)navigator.vibrate(70);}
+  const call=timerCallForV39(raceTimerRemaining);updateRaceLifecycle();if(call===null||call===timerLastCall)return;timerLastCall=call;if(call===0){speakSailing('Start');playStartHooter();if(navigator.vibrate)navigator.vibrate([250,120,250,120,500]);}else{speakSailing(startVoicePhrase(call));if(navigator.vibrate&&call<=10)navigator.vibrate(70);}
 };
 function updateRaceLifecycle(){
-  if(raceTimerRunning&&raceState!=='RACING'&&raceState!=='FINISHED'){if(raceState!=='PRESTART'){raceState='PRESTART';lockRaceSession();}if(raceTimerRemaining<=300&&!preStartCaptureStarted){if(tracker.finished&&tracker.points.length)clearTracker(false);if(!tracker.running)startTracker();preStartCaptureStarted=true;}if(raceTimerRemaining<=0){raceState='RACING';preStartCaptureStarted=true;if(!raceStartEpoch)raceStartEpoch=Date.now();saveRaceSession();}}updateRaceStateBar();renderPreStart();
+  if(raceTimerRunning&&raceState!=='RACING'&&raceState!=='FINISHED'){if(raceState!=='PRESTART'){raceState='PRESTART';lockRaceSession();}if(raceTimerRemaining<=300&&!preStartCaptureStarted){if(tracker.finished&&tracker.points.length)clearTracker(false);if(!tracker.running)startTracker();preStartCaptureStarted=true;}if(raceTimerRemaining<=0){raceState='RACING';preStartCaptureStarted=true;if(!raceStartEpoch)raceStartEpoch=Date.now();saveRaceSession();if(competitionHost&&competitionRoom)competitionSend(competitionHostConfig());}}updateRaceStateBar();renderPreStart();
 }
-const _startRaceTimerV27=startRaceTimer;startRaceTimer=function(){if(tracker.finished&&tracker.points.length&&raceState==='SETUP'){if(!confirm('Start a new race session? The currently saved finished track will be cleared. Export it first if needed.'))return;clearTracker(false);}raceState='PRESTART';lockRaceSession();_startRaceTimerV27();updateRaceLifecycle();if(competitionHost&&competitionRoom)competitionSend(competitionHostConfig());};
-const _resetRaceTimerV27=resetRaceTimer;resetRaceTimer=function(){_resetRaceTimerV27();if(raceState!=='RACING'){raceState='SETUP';preStartCaptureStarted=false;raceStartEpoch=null;}updateRaceStateBar();renderPreStart();};
-function startRaceNow(){if(tracker.finished&&tracker.points.length){if(!confirm('Start a new race and clear the previous finished track?'))return;clearTracker(false);}lockRaceSession();raceState='RACING';raceStartEpoch=Date.now();raceTimerRemaining=0;raceTimerRunning=false;clearInterval(raceTimerId);raceTimerId=null;if(!tracker.running)startTracker();preStartCaptureStarted=true;renderTimer();speakSailing('Start');playStartHooter();saveRaceSession();updateRaceStateBar();if(competitionHost&&competitionRoom)competitionSend(competitionHostConfig());}
+const _startRaceTimerV27=startRaceTimer;startRaceTimer=function(){if(tracker.finished&&tracker.points.length&&raceState==='SETUP'){if(!confirm('Start a new race session? The currently saved finished track will be cleared. Export it first if needed.'))return;clearTracker(false);}raceStartEpoch=null;competitionRaceFinishSeconds=null;resetStartLineForecastTracking();raceState='PRESTART';lockRaceSession();_startRaceTimerV27();updateRaceLifecycle();if(competitionHost&&competitionRoom)competitionSend(competitionHostConfig());};
+const _resetRaceTimerV27=resetRaceTimer;resetRaceTimer=function(){_resetRaceTimerV27();if(raceState!=='RACING'){raceState='SETUP';preStartCaptureStarted=false;raceStartEpoch=null;competitionRaceFinishSeconds=null;resetStartLineForecastTracking();}updateRaceStateBar();renderPreStart();if(competitionHost&&competitionRoom)competitionSend(competitionHostConfig());};
+function startRaceNow(){if(tracker.finished&&tracker.points.length){if(!confirm('Start a new race and clear the previous finished track?'))return;clearTracker(false);}competitionRaceFinishSeconds=null;resetStartLineForecastTracking();raceState='RACING';raceStartEpoch=Date.now();raceTimerRemaining=0;raceTimerRunning=false;clearInterval(raceTimerId);raceTimerId=null;if(!tracker.running)startTracker();preStartCaptureStarted=true;renderTimer();speakSailing('Start');playStartHooter();saveRaceSession();updateRaceStateBar();if(competitionHost&&competitionRoom)competitionSend(competitionHostConfig());}
 useGPS=function(){gpsWanted=true;requestWakeLock();startGPSWatch();updateRaceStateBar();};
-function syncTimerToSchedule(){$('timerPreset').value='5';if($('manualTimerWrap'))$('manualTimerWrap').style.display='none';raceTimerRemaining=300;raceTimerRunning=false;clearInterval(raceTimerId);raceTimerId=null;timerLastCall=null;renderTimer();updateRaceStateBar();}
+function syncTimerToSchedule(){$('timerPreset').value='5';if($('manualTimerWrap'))$('manualTimerWrap').style.display='none';raceTimerRemaining=300;raceTimerRunning=false;clearInterval(raceTimerId);raceTimerId=null;timerLastCall=null;if(raceState!=='RACING'){raceState='SETUP';raceStartEpoch=null;competitionRaceFinishSeconds=null;resetStartLineForecastTracking();}renderTimer();updateRaceStateBar();if(competitionHost&&competitionRoom)competitionSend(competitionHostConfig());}
 
 function renderAssistantCourse(){if($('assistantCourseName'))$('assistantCourseName').textContent=isFreestyle()?'Freestyle / Coastal':`${$('course')?.value||'—'} · ${$('fleet')?.value||''}`;if($('assistantCourseStrip'))$('assistantCourseStrip').innerHTML=route.map((r,i)=>`<button class="course-mini ${i<idx?'done':''} ${i===idx?'current':''} ${i===idx+1?'nextup':''} ${r.finish?'finish':(r.round==='s'?'starboard':'port')}" onclick="selectMarkIndex(${i})" title="${marks[r.code]?.name||r.code}">${r.finish?'FIN':r.code}</button>`).join('');const r=route[idx],nxt=route[idx+1];if($('followingMark'))$('followingMark').innerHTML=nxt?`then <b>${nxt.finish?'FIN':nxt.code} · ${marks[nxt.code]?.name||nxt.code}</b> · ${colourTerms(roundingText(nxt))}`:'Finish / no following mark';}
 let lastMarkRefCode=null;const MARK_APPEARANCE={
@@ -2436,7 +2467,7 @@ function shareRace(){
   else{files.forEach(f=>{const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)});alert('Race summary and CSV were exported. Use your email/share app to send them.');}
 }
 
-function finishRaceV27(){raceState='FINISHED';saveRaceSession();updateRaceStateBar();}
+function finishRaceV27(){competitionRaceFinishSeconds=validRaceStartEpoch(raceStartEpoch)?Math.max(0,(Date.now()-raceStartEpoch)/1000):0;raceState='FINISHED';saveRaceSession();updateRaceStateBar();if(competitionHost&&competitionRoom)competitionSend(competitionHostConfig());}
 
 document.addEventListener('click',e=>{
   const target=e.target.closest('[data-info]');
@@ -2471,7 +2502,7 @@ if($('freeClearBtn'))$('freeClearBtn').onclick=clearFreestyleCourse;
 if($('freeFinishType'))$('freeFinishType').onchange=()=>{updateFreestyleFinishUI();if(isFreestyle())activateFreestyleCourse(false);saveSailingState();saveRaceSession();};
 if($('freeFinishMark'))$('freeFinishMark').onchange=()=>{renderFreestyleFinishStatus();if(isFreestyle())activateFreestyleCourse(false);saveSailingState();saveRaceSession();};
 if($('freeApplyFinishBtn'))$('freeApplyFinishBtn').onclick=()=>{if(isFreestyle())activateFreestyleCourse(false);renderFreestyleFinishStatus();saveSailingState();saveRaceSession();};
-$('day').onchange=()=>{if(!confirmSessionChange())return restoreRaceSession();fillFleet();updateScheduledStartUI();if(!isFreestyle())loadCourse();saveSailingState()};$('fleet').onchange=()=>{if(!confirmSessionChange())return restoreRaceSession();fillCourse();if(!isFreestyle())loadCourse();saveSailingState()};$('course').onchange=()=>{if(!confirmSessionChange())return restoreRaceSession();if(!isFreestyle())loadCourse();saveSailingState();renderCompetitionAll();if(competitionHost)competitionSend(competitionHostConfig())};$('autoAdvance').onchange=()=>{const v=Number($('autoAdvance').value)||0;$('autoInfo').textContent=v?`Auto-advance is ON at ${v} m. The manual Next mark button still works.`:'Auto-advance is OFF. Use the manual Next mark button.';lastAutoAdvance=0;update()};$('demoBtn').onclick=startDemo;$('gpsBtn').onclick=useGPS;$('startRaceNowBtn').onclick=startRaceNow;$('nextBtn').onclick=()=>{const old=idx;idx=Math.min(route.length-1,idx+1);lastAutoAdvance=Date.now();renderRoute();saveRaceSession();update();if(idx!==old)announceActiveMarkChange()};$('weatherBtn').onclick=fetchWeather;$('refreshSetupWindBtn').onclick=fetchWeather;$('applyWindBtn').onclick=applyWindSetting;$('windMode').onchange=updateWindSetupUI;$('startReference').onchange=()=>{applyHutFixedLine();saveSailingState();renderMap();renderStartLinePanel()};$('pingCommitteeBtn').onclick=()=>pingStartEnd('committee');$('pingHutBtn').onclick=()=>pingStartEnd('hut');$('clearStartLineBtn').onclick=clearStartLine;$('mountMode').onchange=async()=>{updateMountStatus();if($('mountMode').value==='fixed')await enableCompass();};if($('devicePosition'))$('devicePosition').onchange=()=>{updateDevicePositionUI();saveSailingState();saveRaceSession();renderStartLinePanel();};if($('customDeviceOffset'))$('customDeviceOffset').onchange=()=>{updateDevicePositionUI();saveSailingState();saveRaceSession();renderStartLinePanel();};$('keepAwake').onchange=()=>{$('keepAwake').checked?requestWakeLock():releaseWakeLock();saveSailingState()};$('savePolarBtn').onclick=savePolar;$('clearPolarBtn').onclick=clearPolar;$('syncScheduleBtn').onclick=syncTimerToSchedule;$('voiceMode').onchange=saveSailingState;if($('repeatNavBtn'))$('repeatNavBtn').onclick=repeatCurrentNavigation;if($('hutLimitMark'))$('hutLimitMark').onchange=()=>{applyHutFixedLine();renderStartLinePanel();renderMap();renderFreestyleStartStatus();renderFreestyleMap();if(isFreestyle()&&$('freeStartType')?.value==='hut')activateFreestyleCourse(false);saveSailingState();saveRaceSession();};$('shareRaceBtn').onclick=shareRace;
+$('day').onchange=()=>{if(!confirmSessionChange())return restoreRaceSession();fillFleet();updateScheduledStartUI();if(!isFreestyle())loadCourse();saveSailingState()};$('fleet').onchange=()=>{if(!confirmSessionChange())return restoreRaceSession();fillCourse();if(!isFreestyle())loadCourse();saveSailingState()};$('course').onchange=()=>{if(!confirmSessionChange())return restoreRaceSession();resetStartLineForecastTracking();if(!isFreestyle())loadCourse();saveSailingState();renderCompetitionAll();if(competitionHost)competitionSend(competitionHostConfig())};$('autoAdvance').onchange=()=>{const v=Number($('autoAdvance').value)||0;$('autoInfo').textContent=v?`Auto-advance is ON at ${v} m. The manual Next mark button still works.`:'Auto-advance is OFF. Use the manual Next mark button.';lastAutoAdvance=0;update()};$('demoBtn').onclick=startDemo;$('gpsBtn').onclick=useGPS;$('startRaceNowBtn').onclick=startRaceNow;$('nextBtn').onclick=()=>{const old=idx;idx=Math.min(route.length-1,idx+1);lastAutoAdvance=Date.now();renderRoute();saveRaceSession();update();if(idx!==old)announceActiveMarkChange()};$('weatherBtn').onclick=fetchWeather;$('refreshSetupWindBtn').onclick=fetchWeather;$('applyWindBtn').onclick=applyWindSetting;$('windMode').onchange=updateWindSetupUI;$('startReference').onchange=()=>{resetStartLineForecastTracking();applyHutFixedLine();saveSailingState();renderMap();renderStartLinePanel()};$('pingCommitteeBtn').onclick=()=>pingStartEnd('committee');$('pingHutBtn').onclick=()=>pingStartEnd('hut');$('clearStartLineBtn').onclick=clearStartLine;$('mountMode').onchange=async()=>{updateMountStatus();if($('mountMode').value==='fixed')await enableCompass();};if($('devicePosition'))$('devicePosition').onchange=()=>{updateDevicePositionUI();saveSailingState();saveRaceSession();renderStartLinePanel();};if($('customDeviceOffset'))$('customDeviceOffset').onchange=()=>{updateDevicePositionUI();saveSailingState();saveRaceSession();renderStartLinePanel();};$('keepAwake').onchange=()=>{$('keepAwake').checked?requestWakeLock():releaseWakeLock();saveSailingState()};$('savePolarBtn').onclick=savePolar;$('clearPolarBtn').onclick=clearPolar;$('syncScheduleBtn').onclick=syncTimerToSchedule;$('voiceMode').onchange=saveSailingState;if($('repeatNavBtn'))$('repeatNavBtn').onclick=repeatCurrentNavigation;if($('hutLimitMark'))$('hutLimitMark').onchange=()=>{resetStartLineForecastTracking();applyHutFixedLine();renderStartLinePanel();renderMap();renderFreestyleStartStatus();renderFreestyleMap();if(isFreestyle()&&$('freeStartType')?.value==='hut')activateFreestyleCourse(false);saveSailingState();saveRaceSession();};$('shareRaceBtn').onclick=shareRace;
 $('recordYesBtn').onclick=()=>beginSailingWithRecording(true);$('recordNoBtn').onclick=()=>beginSailingWithRecording(false);$('runAnalysisBtn').onclick=analyseRace;document.querySelectorAll('[data-analysis-chart]').forEach(b=>b.onclick=()=>setAnalysisChart(b.dataset.analysisChart));$('trackStartBtn').onclick=startTracker;$('trackPauseBtn').onclick=pauseTracker;$('trackFinishBtn').onclick=()=>{finishTracker();finishRaceV27()};$('trackClearBtn').onclick=()=>clearTracker(true);setInterval(updateTrackerUI,1000);loadTracker();
 $('timerPreset').onchange=()=>{$('manualTimerWrap').style.display=$('timerPreset').value==='manual'?'block':'none';resetRaceTimer()};$('manualTimer').onchange=resetRaceTimer;$('timerStartBtn').onclick=()=>{startRaceTimer();$('timerPauseBtn').textContent='Pause'};$('timerPauseBtn').onclick=togglePauseTimer;$('timerResetBtn').onclick=resetRaceTimer;$('timerAddBtn').onclick=()=>{raceTimerRemaining+=60;renderTimer()};
 
