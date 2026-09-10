@@ -6,8 +6,16 @@ SparklesGPT / DBSC Sailing revision history
 - 7 Sept 2026 v2: Single test build. Adds a static Coastal SVG base directly inside the HTML before JavaScript runs, so the Dublin Bay map is visible immediately while the GPS/course/wind overlay refreshes on top.
 - 7 Sept 2026 v4: Single consolidated test build. Adds route arrows and BEAT/REACH/RUN labels on DBSC and Coastal maps, smooth Coastal fit/zoom, and Coastal-aware Tracker map/track display.
 - 7 Sept 2026 v5: Coastal map reframe. Defaults to a Dún Laoghaire-to-Bray coastal chart, keeps East Kish in a separate Full Offshore view unless used by the route, and adds proper drag, wheel and touch panning/zooming.
+- 8 Sept 2026 v1: Maintenance reorganisation. Keeps the working v5 Coastal behaviour, disables the old v5 Coastal runtime, and moves the active Coastal implementation into one named module at the end of the file for easier iteration.
+- 10 Sept 2026 v1: Adds weekend Coastal Course presets for Cruiser 0/1 and all other classes, including Muglins and the new orange inflatable mark east of the Muglins.
+
+Maintenance notes:
+- Current active Coastal code is in the final script: window.SparklesGPT.active.coastalMap.
+- Current active Coastal course preset code is in the final script: window.SparklesGPT.active.coastalCourses.
+- Older v50/v52/v4/v5 Coastal blocks are historical compatibility layers. Avoid editing them unless intentionally recovering an older behaviour.
+- For the next Coastal change, edit only the final active module and this revision history.
 -->
-<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/><meta content="#06111a" name="theme-color"/><title>SparklesGPT · DBSC Sailing · 7 Sept 2026 · v5</title><style>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/><meta content="#06111a" name="theme-color"/><title>SparklesGPT · DBSC Sailing · 10 Sept 2026 · v1</title><style>
 :root{--bg:#06111a;--panel:#0b1b27;--panel2:#102735;--text:#f4f8fb;--muted:#91a9b9;--accent:#36a3ff;--good:#62d86e;--warn:#ffcc4d;--red:#ff6868;--line:#1e3b4d}*{box-sizing:border-box}html{background:var(--bg)}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:linear-gradient(160deg,#0d2638,#06111a 40%);color:var(--text);min-height:100vh}button,select,input{font:inherit}.topbar{position:sticky;top:0;z-index:50;background:#07131df2;backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}.brandrow{max-width:1150px;margin:auto;padding:12px 16px 8px;display:flex;gap:12px;align-items:center;justify-content:space-between}.brand h1{font-size:20px;margin:0}.brand small{color:var(--muted)}.topstatus{display:flex;gap:7px;align-items:center}.mini{font-size:11px;padding:7px 9px;background:#102532;border:1px solid var(--line);border-radius:999px}.tabs{max-width:1150px;margin:auto;display:flex;gap:5px;overflow-x:auto;padding:4px 12px 10px;-webkit-overflow-scrolling:touch;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab-btn{white-space:nowrap;border:0;background:#102532;color:#b8d0de;padding:9px 13px;border-radius:12px;font-weight:800;font-size:12px}.tab-btn.active{background:var(--accent);color:#001522}.content{max-width:1150px;margin:auto;padding:18px 16px 70px}.tab-panel{display:none}.tab-panel.active{display:block}.panel{background:#0a1924e8;border:1px solid var(--line);border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 18px 50px #0004}.panel h2{font-size:22px;margin:0 0 6px}.panel h3{margin:0 0 8px}.lead{color:var(--muted);margin:0 0 16px;line-height:1.45}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#b4c8d5;margin:12px 0 5px}select,input{width:100%;background:#102532;color:white;border:1px solid #2b4d61;border-radius:12px;padding:11px 12px}.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}button{border:0;border-radius:13px;padding:11px 14px;font-weight:800;cursor:pointer}.primary{background:var(--accent);color:#001522}.secondary{background:#173143;color:#dff2ff}.danger{background:#47252b;color:#ffdfe3}.statuscard,.metric{background:#0e2330;border:1px solid var(--line);border-radius:16px;padding:14px}.metric small,.statuscard small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07em}.metric b{display:block;font-size:28px;margin-top:4px}.metric .sub{font-size:12px;color:var(--muted);margin-top:4px}.hero-nav{display:grid;grid-template-columns:1.3fr .7fr;gap:14px}.nextmark{background:linear-gradient(135deg,#102d40,#0c1d29);border:1px solid #28526b;border-radius:22px;padding:20px}.nextmark .code{font-size:34px;font-weight:900}.bigbearing{font-size:58px;font-weight:900;line-height:1}.arrow{font-size:52px;color:var(--accent);display:inline-block}.route-list{display:flex;gap:7px;flex-wrap:wrap}.chip{padding:7px 10px;border-radius:999px;background:#142b39;font-size:12px}.chip.next{background:#174566;color:#d7efff}.chip.port{border-bottom:2px solid var(--red)}.chip.starboard{border-bottom:2px solid var(--good)}.course-table-wrap{overflow:auto;max-width:100%;border:1px solid var(--line);border-radius:14px;-webkit-overflow-scrolling:touch}.course-table{width:max-content;min-width:900px;border-collapse:separate;border-spacing:0;font-size:12px}.course-table th,.course-table td{padding:9px;border-bottom:1px solid #163141;white-space:nowrap;background:#081720}.course-table th{background:#102936;color:#aac7d7;position:sticky;top:0}.course-table tr.active td{background:#12364e}.porttxt{color:#ff9696;font-weight:800}.startxt{color:#8aeb97;font-weight:800}.mapwrap{background:#06121b;border:1px solid var(--line);border-radius:20px;overflow:hidden}.mapwrap svg{display:block;width:100%;height:auto;min-height:420px}.maplegend{display:flex;flex-wrap:wrap;gap:12px;padding:10px 14px;color:var(--muted);font-size:12px}.guidebox{text-align:center;padding:28px 16px;background:linear-gradient(150deg,#0c2634,#071720);border:1px solid var(--line);border-radius:22px}.guidebox .main{font-size:38px;font-weight:900;color:var(--good)}.guidebox .detail{color:#c4dbe8;margin-top:8px}.windarrow{font-size:70px;color:var(--accent)}.tide-events{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tide-state{font-weight:900;color:var(--accent);font-size:26px}.progress{height:15px;border-radius:999px;background:#102532;overflow:hidden}.progress>div{height:100%;background:linear-gradient(90deg,#36a3ff,#62d86e);width:0}.timer{font-size:32px;font-weight:900;letter-spacing:.06em}.note{color:var(--muted);font-size:12px;line-height:1.5}.testing summary{cursor:pointer;color:#8aa7b7;font-weight:700}.mobileonly{display:none}@media(max-width:760px){.brandrow{align-items:flex-start}.topstatus{display:none}.content{padding:12px 10px 60px}.panel{padding:15px;border-radius:16px}.grid2,.grid3,.grid4,.hero-nav{grid-template-columns:1fr}.mapwrap svg{min-height:330px}.bigbearing{font-size:46px}.metric b{font-size:24px}.tabs{padding-left:8px;padding-right:8px}.mobileonly{display:block}.course-table{min-width:820px}}
 
 .chart-map{position:relative;width:100%;background:#d8f2ff;border:1px solid var(--line);border-radius:18px;overflow:hidden}
@@ -816,9 +824,9 @@ body.light-mode .v51-voice-transcript small{color:#405d6c!important}
 
 /* ===== 7 Sept 2026 v4: route clarity, smooth Coastal zoom and Coastal Tracker ===== */
 .v7sept-v4-route-arrow{fill:#1688ff;stroke:#fff;stroke-width:1.2}.v7sept-v4-leg-pill rect{fill:rgba(255,255,255,.92);stroke:#1264a3;stroke-width:1.1}.v7sept-v4-leg-pill text{font-size:10px;font-weight:1000;fill:#092435;paint-order:stroke;stroke:#fff;stroke-width:2px}.v7sept-v4-leg-pill.beat rect{stroke:#0079c9}.v7sept-v4-leg-pill.reach rect{stroke:#b88400}.v7sept-v4-leg-pill.run rect{stroke:#087a35}.chart-map.v7sept-v4-coastal-tracker{height:min(62vh,620px);min-height:360px;background:#95d7fb!important}.chart-map.v7sept-v4-coastal-tracker img{display:none!important}.chart-map.v7sept-v4-coastal-tracker svg{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;display:block!important;background:#95d7fb!important}.v7sept-v4-tracker-note{fill:#173a49;font-size:10px;font-weight:900;paint-order:stroke;stroke:#e9f6fb;stroke-width:2px}body.light-mode .v7sept-v4-leg-pill text{fill:#07131d!important;stroke:#fff!important}
-/* ===== 7 Sept 2026 v5: Coastal framing and map interaction ===== */
+/* ===== 8 Sept 2026 v1: active Coastal module support styles ===== */
 .v7sept-v4-coastal-map{cursor:grab!important;touch-action:none!important}.v7sept-v4-coastal-map.dragging{cursor:grabbing!important}.v7sept-v5-full-btn{background:#21465d!important;color:#e9f7ff!important}.v7sept-v5-view-note{fill:#173a49;font-size:10px;font-weight:900;paint-order:stroke;stroke:#e9f6fb;stroke-width:2px}.v7sept-v5-hidden-mark{opacity:.55}.v7sept-v5-pan-hint{font-size:9px;color:var(--muted);font-weight:900;padding-left:4px}
-</style></head><body><header class="topbar"><div class="brandrow"><div class="brand"><h1>⛵ SparklesGPT</h1><small>DBSC Sailing App · 7 Sept 2026 · v5</small></div><div class="topstatus"><span class="mini" id="clock">--:--</span><span class="mini">GPS <b id="gpsStatus">Idle</b></span><span class="mini">Wind <b id="weatherStatus">—</b></span><span class="mini">Course <b id="courseStatus">—</b></span></div><button class="v45-theme-toggle" id="v45ThemeToggle" type="button" aria-label="Toggle light or dark display">&#9728; Light</button></div><nav class="tabs">
+</style></head><body><header class="topbar"><div class="brandrow"><div class="brand"><h1>⛵ SparklesGPT</h1><small>DBSC Sailing App · 10 Sept 2026 · v1</small></div><div class="topstatus"><span class="mini" id="clock">--:--</span><span class="mini">GPS <b id="gpsStatus">Idle</b></span><span class="mini">Wind <b id="weatherStatus">—</b></span><span class="mini">Course <b id="courseStatus">—</b></span></div><button class="v45-theme-toggle" id="v45ThemeToggle" type="button" aria-label="Toggle light or dark display">&#9728; Light</button></div><nav class="tabs">
 <button class="tab-btn active" data-tab="selection">Setup</button>
 <button class="tab-btn" data-tab="startmarks">Course</button>
 <button class="tab-btn" data-tab="freestyle" id="freestyleTabBtn">Coastal</button>
@@ -842,7 +850,7 @@ body.light-mode .v51-voice-transcript small{color:#405d6c!important}
 <div class="panel v45-setup-panel"><h2>Setup</h2>
 <div class="v41-course-banner v45-course-banner"><div><small>COURSE</small><b id="v41StartCourse">—</b><span id="v41StartCourseRoute">—</span></div><button class="secondary" id="v41OpenCourseBtn" type="button">Course &rarr;</button></div>
 <div class="v45-setup-grid">
-<div class="v45-control"><label>Race type</label><select id="raceType"><option selected="" value="dbsc">DBSC</option><option value="freestyle">Coastal</option><option value="competition">Multi-Boat Race</option></select><b class="v45-hidden" id="raceTypeStatus">Fixed DBSC</b></div>
+<div class="v45-control"><label>Race type</label><select id="raceType"><option selected="" value="dbsc">DBSC</option><option value="freestyle">Coastal / Freeform</option><option value="competition">Multi-Boat Race</option></select><b class="v45-hidden" id="raceTypeStatus">Fixed DBSC</b></div>
 <div id="fixedCourseFields" class="v45-fixed-fields">
 <div class="v45-control"><label>Race day</label><select id="day"></select></div>
 <div class="v45-control"><label>Fleet / start</label><select id="fleet"></select></div>
@@ -1303,9 +1311,11 @@ const marks = {
  SO:{name:'Shanganagh Outfall',lat:53+14.9/60,lon:-(6+5.15/60),group:'coastal',desc:'Yellow outfall mark'},
  BO:{name:'Bray Outfall',lat:53+13.24/60,lon:-(6+4.52/60),group:'coastal',desc:'Yellow outfall mark'},
  EK:{name:'East Kish',lat:53+14.338/60,lon:-(5+53.595/60),group:'coastal',desc:'Red lateral mark'},
- KI:{name:'Killiney',lat:53+13.19/60,lon:-(6+5.982/60),group:'coastal',desc:'Bray Sailing Club spherical red/orange buoy'},
- NE:{name:'North-East',lat:53+13.093/60,lon:-(6+5.544/60),group:'coastal',desc:'Bray Sailing Club spherical red/orange buoy'},
- BH:{name:'Bray Head',lat:53+12.107/60,lon:-(6+4.944/60),group:'coastal',desc:'Bray Sailing Club spherical red/orange buoy'}
+KI:{name:'Killiney',lat:53+13.19/60,lon:-(6+5.982/60),group:'coastal',desc:'Bray Sailing Club spherical red/orange buoy'},
+NE:{name:'North-East',lat:53+13.093/60,lon:-(6+5.544/60),group:'coastal',desc:'Bray Sailing Club spherical red/orange buoy'},
+BH:{name:'Bray Head',lat:53+12.107/60,lon:-(6+4.944/60),group:'coastal',desc:'Bray Sailing Club spherical red/orange buoy'},
+MG:{name:'Muglins',lat:53.271300,lon:-6.071800,group:'coastal',desc:'Muglins island / coastal rounding reference'},
+IM:{name:'Inflatable Mark',lat:53.275985,lon:-6.074676,group:'coastal',desc:'Large orange inflatable east of the Muglins'}
 };
 const data={};
 function add(day,fleet,letter,rows){data[day]??={};data[day][fleet]??={};rows.forEach((r,i)=>data[day][fleet][letter+(i+1)]=r.trim().split(/\s+/));}
@@ -2958,7 +2968,7 @@ let lastMarkRefCode=null;const MARK_APPEARANCE={
  S:{type:'dan',bands:['#f5d51d','#39a86b'],desc:'Yellow / Green'},T:{type:'triangle',bands:['#39a86b','#fff'],desc:'Green / White'},V:{type:'triangle',bands:['#f68a42'],desc:'Orange'},
  W:{type:'triangle',bands:['#202020'],desc:'Black'},X:{type:'triangle',bands:['#f5d51d'],desc:'Yellow navigation mark'},Y:{type:'dan',bands:['#f5d51d'],desc:'Yellow'},
  Z:{type:'generic',bands:['#8fa7b5'],desc:'DBSC Zebra mark'},'2':{type:'generic',bands:['#202020'],desc:'Black start mark'},'3':{type:'generic',bands:['#39a86b'],desc:'Green start mark'},
- SO:{type:'generic',bands:['#f5d51d'],desc:'Yellow outfall mark'},BO:{type:'generic',bands:['#f5d51d'],desc:'Yellow outfall mark'},EK:{type:'generic',bands:['#d83a45'],desc:'Red lateral mark'},KI:{type:'sphere',bands:['#e75935'],desc:'Red/orange spherical buoy'},NE:{type:'sphere',bands:['#e75935'],desc:'Red/orange spherical buoy'},BH:{type:'sphere',bands:['#e75935'],desc:'Red/orange spherical buoy'},FIN:{type:'finish',bands:['#dcebf1'],desc:'Finish reference'}
+ SO:{type:'generic',bands:['#f5d51d'],desc:'Yellow outfall mark'},BO:{type:'generic',bands:['#f5d51d'],desc:'Yellow outfall mark'},EK:{type:'generic',bands:['#d83a45'],desc:'Red lateral mark'},KI:{type:'sphere',bands:['#e75935'],desc:'Red/orange spherical buoy'},NE:{type:'sphere',bands:['#e75935'],desc:'Red/orange spherical buoy'},BH:{type:'sphere',bands:['#e75935'],desc:'Red/orange spherical buoy'},MG:{type:'generic',bands:['#4f5658'],desc:'Muglins island / coastal rounding reference'},IM:{type:'generic',bands:['#ff8a18'],desc:'Large orange inflatable mark'},FIN:{type:'finish',bands:['#dcebf1'],desc:'Finish reference'}
 };
 function markSvg(code){
  const a=MARK_APPEARANCE[code]||{type:'generic',bands:['#f5d51d'],desc:'Mark'};
@@ -3672,7 +3682,7 @@ setTimeout(()=>{renderMobileCourseCardsV48();updateMarkNavV48()},30);
   if(typeof renderCompetitionMap==='function'){const before=renderCompetitionMap;renderCompetitionMap=function(){before();appendWind(byId('competitionMap'))}}
   if(typeof update==='function'){const before=update;update=function(){before();updateVmg();requestAnimationFrame(()=>{appendWind(byId('courseMap'));appendWind(byId('trackMap'))})}}
   const oldOpen=typeof openTab==='function'?openTab:null;if(oldOpen){openTab=function(name){oldOpen(name);if(name==='freestyle')requestAnimationFrame(()=>{if(typeof renderFreestyleMap==='function')renderFreestyleMap()})}}
-  function init(){document.querySelector('.brand small')&&(document.querySelector('.brand small').textContent='DBSC Sailing App · 7 Sept 2026 · v5');byId('voiceStatus')&&(byId('voiceStatus').style.display='none');updateVmg();requestAnimationFrame(()=>{if(typeof renderMap==='function')renderMap();if(typeof renderTrackerMap==='function')renderTrackerMap();if(typeof renderFreestyleMap==='function')renderFreestyleMap()})}
+  function init(){document.querySelector('.brand small')&&(document.querySelector('.brand small').textContent='DBSC Sailing App · 10 Sept 2026 · v1');byId('voiceStatus')&&(byId('voiceStatus').style.display='none');updateVmg();requestAnimationFrame(()=>{if(typeof renderMap==='function')renderMap();if(typeof renderTrackerMap==='function')renderTrackerMap();if(typeof renderFreestyleMap==='function')renderFreestyleMap()})}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
   if('ResizeObserver' in window){const h=byId('coastalNativeMap');if(h)new ResizeObserver(()=>requestAnimationFrame(()=>{if(typeof renderFreestyleMap==='function')renderFreestyleMap()})).observe(h)}
 })();
@@ -3725,8 +3735,10 @@ setTimeout(()=>{renderMobileCourseCardsV48();updateMarkNavV48()},30);
 })();
 </script>
 <script>
-/* ===== 7 Sept 2026 v5 Coastal reframe + real pan/zoom ===== */
+window.SparklesGPTUseActiveCoastalModule = true;
+/* ===== 7 Sept 2026 v5 legacy Coastal reframe: retained inactive for fallback ===== */
 (function(){
+  if(window.SparklesGPTUseActiveCoastalModule)return;
   const byId=id=>document.getElementById(id),W=940,H=660;
   const FULL={minLat:53.160,maxLat:53.405,minLon:-6.250,maxLon:-5.450};
   const HOME={minLat:53.190,maxLat:53.333,minLon:-6.175,maxLon:-6.045};
@@ -3776,9 +3788,849 @@ setTimeout(()=>{renderMobileCourseCardsV48();updateMarkNavV48()},30);
   const oldTracker=typeof renderTrackerMap==='function'?renderTrackerMap:null;renderTrackerMap=function(){if(typeof isFreestyle==='function'&&isFreestyle()){renderTrackerV5();return}const svg=byId('trackMap');svg?.closest('.chart-map')?.classList.remove('v7sept-v4-coastal-tracker');if(oldTracker)oldTracker()};
   const oldOpen=typeof openTab==='function'?openTab:null;openTab=function(name){if(oldOpen)oldOpen(name);if(name==='freestyle')requestAnimationFrame(()=>{ensureControls();wireMap();renderCoastalV5()});if(name==='tracker')requestAnimationFrame(renderTrackerMap)};
   const oldUpdate=typeof update==='function'?update:null;update=function(){if(oldUpdate)oldUpdate();requestAnimationFrame(()=>{if(typeof isFreestyle==='function'&&isFreestyle()){renderCoastalV5();renderTrackerV5()}})};
-  function init(){document.title='SparklesGPT · DBSC Sailing · 7 Sept 2026 · v5';const b=document.querySelector('.brand small');if(b)b.textContent='DBSC Sailing App · 7 Sept 2026 · v5';ensureControls();wireMap();setHome()}
+  function init(){document.title='SparklesGPT · DBSC Sailing · 10 Sept 2026 · v1';const b=document.querySelector('.brand small');if(b)b.textContent='DBSC Sailing App · 10 Sept 2026 · v1';ensureControls();wireMap();setHome()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
   requestAnimationFrame(()=>{ensureControls();wireMap();renderCoastalV5()});
   window.addEventListener('resize',()=>requestAnimationFrame(()=>{renderCoastalV5();if(typeof isFreestyle==='function'&&isFreestyle())renderTrackerV5()}));
+})();
+</script>
+<script>
+/* ===== 8 Sept 2026 v1 ACTIVE MODULE: Coastal map =====
+   This is the current Coastal implementation. It intentionally loads after
+   the historical v50/v52/v4/v5 blocks and owns the active Coastal map runtime.
+*/
+(function(){
+  window.SparklesGPT = window.SparklesGPT || {};
+  window.SparklesGPT.active = window.SparklesGPT.active || {};
+
+  const CoastalMap = (function(){
+    const VERSION_TITLE = 'SparklesGPT · DBSC Sailing · 10 Sept 2026 · v1';
+    const VERSION_LABEL = 'DBSC Sailing App · 10 Sept 2026 · v1';
+    const W = 940;
+    const H = 660;
+    const FULL = { minLat: 53.160, maxLat: 53.405, minLon: -6.250, maxLon: -5.450 };
+    const HOME = { minLat: 53.190, maxLat: 53.333, minLon: -6.175, maxLon: -6.045 };
+    const BAY = { minLat: 53.284, maxLat: 53.345, minLon: -6.170, maxLon: -6.080 };
+    const state = { ...HOME, mode: 'home' };
+    const pointers = new Map();
+    let lastPointer = null;
+    let pinchStart = null;
+
+    const coastLine = [
+      { lat: 53.397, lon: -6.185 }, { lat: 53.380, lon: -6.173 },
+      { lat: 53.366, lon: -6.162 }, { lat: 53.350, lon: -6.155 },
+      { lat: 53.336, lon: -6.153 }, { lat: 53.326, lon: -6.151 },
+      { lat: 53.320, lon: -6.148 }, { lat: 53.313, lon: -6.145 },
+      { lat: 53.306, lon: -6.141 }, { lat: 53.299, lon: -6.139 },
+      { lat: 53.2950, lon: -6.1430 }, { lat: 53.2998, lon: -6.1370 },
+      { lat: 53.3022, lon: -6.1320 }, { lat: 53.3011, lon: -6.1270 },
+      { lat: 53.2989, lon: -6.1240 }, { lat: 53.2941, lon: -6.1200 },
+      { lat: 53.2915, lon: -6.1200 }, { lat: 53.2890, lon: -6.1180 },
+      { lat: 53.2865, lon: -6.1160 }, { lat: 53.2830, lon: -6.1120 },
+      { lat: 53.2760, lon: -6.1030 }, { lat: 53.2725, lon: -6.1000 },
+      { lat: 53.2680, lon: -6.1015 }, { lat: 53.2630, lon: -6.1045 },
+      { lat: 53.2580, lon: -6.1080 }, { lat: 53.2520, lon: -6.1110 },
+      { lat: 53.2460, lon: -6.1135 }, { lat: 53.2390, lon: -6.1170 },
+      { lat: 53.2330, lon: -6.1200 }, { lat: 53.2260, lon: -6.1180 },
+      { lat: 53.2190, lon: -6.1130 }, { lat: 53.2120, lon: -6.1080 },
+      { lat: 53.2050, lon: -6.1040 }, { lat: 53.1980, lon: -6.1020 },
+      { lat: 53.1900, lon: -6.1030 }, { lat: 53.1800, lon: -6.1060 },
+      { lat: 53.1680, lon: -6.1100 }
+    ];
+
+    const labelOffsets = {
+      A: [-4, -12], B: [8, -8], C: [8, -8], D: [8, -8], E: [8, -8],
+      F: [8, -8], G: [8, -8], H: [8, 14], J: [8, -8], K: [8, 14],
+      L: [-8, -8], M: [8, -8], N: [8, -8], O: [8, 14], P: [8, -8],
+      Q: [8, 14], R: [8, 14], S: [8, -8], T: [8, 14], V: [8, -8],
+      W: [8, 14], X: [8, -8], Y: [8, 14], Z: [8, -8],
+      SO: [8, -10], BO: [8, 17], EK: [8, -10], KI: [-92, -8],
+      NE: [8, 20], BH: [8, 18], MG: [8, 18], IM: [8, -12]
+    };
+
+    function el(id){ return document.getElementById(id); }
+    function escapeSvg(value){
+      return String(value ?? '').replace(/[&<>\"]/g, ch => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'
+      }[ch]));
+    }
+    function isGeo(point){
+      return point && Number.isFinite(Number(point.lat)) && Number.isFinite(Number(point.lon));
+    }
+    function normalise(deg){
+      return typeof norm === 'function' ? norm(deg) : (((Number(deg) || 0) % 360) + 360) % 360;
+    }
+    function radians(deg){
+      return typeof rad === 'function' ? rad(deg) : Number(deg) * Math.PI / 180;
+    }
+    function routeCodeSet(){
+      return new Set((route || []).map(item => item.code));
+    }
+
+    function setVersionLabels(){
+      document.title = VERSION_TITLE;
+      const brand = document.querySelector('.brand small');
+      if (brand) brand.textContent = VERSION_LABEL;
+    }
+
+    function updateZoomLabel(){
+      const label = el('v50MapZoomLabel');
+      if (!label) return;
+      if (state.mode === 'home') label.textContent = 'Home';
+      else if (state.mode === 'full') label.textContent = 'Full';
+      else if (state.mode === 'route') label.textContent = 'Fit';
+      else if (state.mode === 'bay') label.textContent = 'Bay';
+      else label.textContent = ((FULL.maxLat - FULL.minLat) / (state.maxLat - state.minLat)).toFixed(1) + 'x';
+    }
+
+    function setBounds(target, minLat, maxLat, minLon, maxLon, mode){
+      let latSpan = Math.max(0.018, maxLat - minLat);
+      let lonSpan = Math.max(0.024, maxLon - minLon);
+      const latC = (minLat + maxLat) / 2;
+      const lonC = (minLon + maxLon) / 2;
+      minLat = latC - latSpan / 2;
+      maxLat = latC + latSpan / 2;
+      minLon = lonC - lonSpan / 2;
+      maxLon = lonC + lonSpan / 2;
+
+      if (minLat < FULL.minLat) { maxLat += FULL.minLat - minLat; minLat = FULL.minLat; }
+      if (maxLat > FULL.maxLat) { minLat -= maxLat - FULL.maxLat; maxLat = FULL.maxLat; }
+      if (minLon < FULL.minLon) { maxLon += FULL.minLon - minLon; minLon = FULL.minLon; }
+      if (maxLon > FULL.maxLon) { minLon -= maxLon - FULL.maxLon; maxLon = FULL.maxLon; }
+
+      target.minLat = Math.max(FULL.minLat, minLat);
+      target.maxLat = Math.min(FULL.maxLat, maxLat);
+      target.minLon = Math.max(FULL.minLon, minLon);
+      target.maxLon = Math.min(FULL.maxLon, maxLon);
+      target.mode = mode || 'manual';
+      updateZoomLabel();
+    }
+
+    function setNamedBounds(bounds, mode){
+      setBounds(state, bounds.minLat, bounds.maxLat, bounds.minLon, bounds.maxLon, mode);
+      renderCoastal();
+    }
+
+    function screenPoint(bounds, point){
+      return {
+        x: 18 + (Number(point.lon) - bounds.minLon) / (bounds.maxLon - bounds.minLon) * (W - 36),
+        y: H - 18 - (Number(point.lat) - bounds.minLat) / (bounds.maxLat - bounds.minLat) * (H - 36)
+      };
+    }
+    function geoAt(bounds, x, y){
+      return {
+        lon: bounds.minLon + (x - 18) / (W - 36) * (bounds.maxLon - bounds.minLon),
+        lat: bounds.minLat + (H - 18 - y) / (H - 36) * (bounds.maxLat - bounds.minLat)
+      };
+    }
+    function pointList(bounds, points){
+      return points.map(point => screenPoint(bounds, point))
+        .map(point => point.x.toFixed(1) + ',' + point.y.toFixed(1)).join(' ');
+    }
+    function isVisible(point, margin = 70){
+      return point.x >= -margin && point.x <= W + margin && point.y >= -margin && point.y <= H + margin;
+    }
+
+    function currentTargets(){
+      const selectedRoute = typeof currentFreestyleRoute === 'function'
+        ? currentFreestyleRoute()
+        : (route || []);
+      const items = [];
+      const start = typeof getFreestyleStartPoint === 'function' ? getFreestyleStartPoint() : null;
+      if (isGeo(start)) items.push({ point: start, code: 'START', name: 'Start' });
+      selectedRoute.forEach(item => {
+        const mark = marks?.[item.code];
+        if (isGeo(mark)) items.push({ point: mark, code: item.code, name: mark.name, route: item });
+      });
+      return items;
+    }
+
+    function routeUsesEastKish(){
+      return currentTargets().some(target => target.code === 'EK');
+    }
+
+    function addCoastContext(points){
+      const lats = points.map(point => Number(point.lat));
+      const minLat = Math.min(...lats) - 0.025;
+      const maxLat = Math.max(...lats) + 0.025;
+      const context = [...points];
+      coastLine.forEach(point => {
+        if (point.lat >= minLat && point.lat <= maxLat) context.push(point);
+      });
+      context.push(
+        { lat: 53.2948, lon: -6.1425 },
+        { lat: 53.3010, lon: -6.1360 },
+        { lat: 53.2942, lon: -6.1195 },
+        { lat: 53.3008, lon: -6.1250 }
+      );
+      return context.filter(isGeo);
+    }
+
+    function fitPoints(target, points, mode = 'route'){
+      const usable = addCoastContext(points.filter(isGeo));
+      if (usable.length < 2) {
+        setBounds(target, HOME.minLat, HOME.maxLat, HOME.minLon, HOME.maxLon, 'home');
+        return;
+      }
+      let minLat = Math.min(...usable.map(point => Number(point.lat)));
+      let maxLat = Math.max(...usable.map(point => Number(point.lat)));
+      let minLon = Math.min(...usable.map(point => Number(point.lon)));
+      let maxLon = Math.max(...usable.map(point => Number(point.lon)));
+      const latPad = Math.max(0.010, (maxLat - minLat) * 0.20);
+      const lonPad = Math.max(0.012, (maxLon - minLon) * 0.20);
+      setBounds(target, minLat - latPad, maxLat + latPad, minLon - lonPad, maxLon + lonPad, mode);
+    }
+
+    function showHome(){ setNamedBounds(HOME, 'home'); }
+    function showBay(){ setNamedBounds(BAY, 'bay'); }
+    function showFull(){ setNamedBounds(FULL, 'full'); }
+    function fitRoute(){
+      const points = currentTargets().map(target => target.point).filter(isGeo);
+      if (points.length < 2) showHome();
+      else {
+        fitPoints(state, points, 'route');
+        renderCoastal();
+      }
+    }
+    function showBoat(){
+      if ((gpsWanted || demoTimer) && isGeo(pos)) {
+        setBounds(state, pos.lat - 0.022, pos.lat + 0.022, pos.lon - 0.030, pos.lon + 0.030, 'boat');
+        renderCoastal();
+      } else {
+        const status = el('v50CoastalStatus');
+        if (status) status.textContent = 'Boat position is not live yet. Start GPS or Demo first.';
+      }
+    }
+
+    function panBy(dx, dy){
+      const latSpan = state.maxLat - state.minLat;
+      const lonSpan = state.maxLon - state.minLon;
+      const lonShift = -dx / (W - 36) * lonSpan;
+      const latShift = dy / (H - 36) * latSpan;
+      setBounds(state, state.minLat + latShift, state.maxLat + latShift, state.minLon + lonShift, state.maxLon + lonShift, 'manual');
+    }
+
+    function zoomAt(multiplier, sx = W / 2, sy = H / 2){
+      const mult = Math.max(0.72, Math.min(1.38, multiplier));
+      const anchor = geoAt(state, sx, sy);
+      const newLatSpan = (state.maxLat - state.minLat) / mult;
+      const newLonSpan = (state.maxLon - state.minLon) / mult;
+      const rx = (sx - 18) / (W - 36);
+      const ry = (H - 18 - sy) / (H - 36);
+      setBounds(
+        state,
+        anchor.lat - ry * newLatSpan,
+        anchor.lat + (1 - ry) * newLatSpan,
+        anchor.lon - rx * newLonSpan,
+        anchor.lon + (1 - rx) * newLonSpan,
+        'manual'
+      );
+      renderCoastal();
+    }
+
+    function grid(bounds){
+      const span = bounds.maxLat - bounds.minLat;
+      const step = span < 0.05 ? 0.01 : span < 0.10 ? 0.02 : 0.05;
+      let html = '';
+      for (let lat = Math.ceil(bounds.minLat / step) * step; lat <= bounds.maxLat + 1e-9; lat += step) {
+        const a = screenPoint(bounds, { lat, lon: bounds.minLon });
+        const b = screenPoint(bounds, { lat, lon: bounds.maxLon });
+        html += '<line class="v7sept-v4-grid" x1="' + a.x + '" y1="' + a.y + '" x2="' + b.x + '" y2="' + b.y + '"/>';
+      }
+      for (let lon = Math.ceil(bounds.minLon / step) * step; lon <= bounds.maxLon + 1e-9; lon += step) {
+        const a = screenPoint(bounds, { lat: bounds.minLat, lon });
+        const b = screenPoint(bounds, { lat: bounds.maxLat, lon });
+        html += '<line class="v7sept-v4-grid" x1="' + a.x + '" y1="' + a.y + '" x2="' + b.x + '" y2="' + b.y + '"/>';
+      }
+      return html;
+    }
+
+    function background(bounds){
+      const land = [{ lat: coastLine[0].lat, lon: -6.42 }, ...coastLine, { lat: coastLine[coastLine.length - 1].lat, lon: -6.42 }];
+      let html = '<rect class="v7sept-v4-sea" width="' + W + '" height="' + H + '"/>' +
+        '<ellipse class="v7sept-v4-depth1" cx="620" cy="250" rx="330" ry="240"/>' +
+        '<ellipse class="v7sept-v4-depth2" cx="690" cy="505" rx="250" ry="120"/>' +
+        '<polygon class="v7sept-v4-land" points="' + pointList(bounds, land) + '"/>' +
+        '<polyline class="v7sept-v4-shore" points="' + pointList(bounds, coastLine) + '"/>';
+
+      [[{ lat: 53.2948, lon: -6.1425 }, { lat: 53.3010, lon: -6.1360 }],
+       [{ lat: 53.2942, lon: -6.1195 }, { lat: 53.3008, lon: -6.1250 }]].forEach(pair => {
+        const a = screenPoint(bounds, pair[0]);
+        const b = screenPoint(bounds, pair[1]);
+        if (isVisible(a, 100) || isVisible(b, 100)) {
+          html += '<line class="v7sept-v4-harbour" x1="' + a.x + '" y1="' + a.y + '" x2="' + b.x + '" y2="' + b.y + '"/>';
+        }
+      });
+
+      [
+        ['SEAPOINT', 53.320, -6.154], ['DUN LAOGHAIRE', 53.296, -6.155],
+        ['SANDYCOVE', 53.289, -6.128], ['DALKEY', 53.278, -6.119],
+        ['KILLINEY', 53.252, -6.130], ['SHANKILL', 53.233, -6.134],
+        ['BRAY', 53.204, -6.127]
+      ].forEach(([name, lat, lon]) => {
+        const p = screenPoint(bounds, { lat, lon });
+        if (isVisible(p, 90)) html += '<text class="v7sept-v4-place" x="' + p.x + '" y="' + p.y + '">' + name + '</text>';
+      });
+
+      [
+        ['DALKEY ISLAND', 53.2763, -6.0860, 9, 5.5],
+        ['MUGLINS', 53.2713, -6.0718, 5.5, 4]
+      ].forEach(([name, lat, lon, rx, ry]) => {
+        const p = screenPoint(bounds, { lat, lon });
+        if (isVisible(p, 90)) {
+          html += '<ellipse class="v7sept-v4-island" cx="' + p.x + '" cy="' + p.y + '" rx="' + rx + '" ry="' + ry + '"/>' +
+            '<text class="v7sept-v4-place small" x="' + (p.x + 8) + '" y="' + (p.y - 6) + '">' + name + '</text>';
+        }
+      });
+
+      const bay = screenPoint(bounds, { lat: 53.257, lon: -6.020 });
+      if (isVisible(bay, 130)) html += '<text class="v7sept-v4-water-label" x="' + bay.x + '" y="' + bay.y + '">Dublin Bay</text>';
+      return html;
+    }
+
+    function wind(cx = 805, cy = 92){
+      const data = weather || { dir: 0, wind: 0, source: 'wind' };
+      const dir = normalise(Number(data.dir) || 0);
+      const speed = Math.max(0, Number(data.wind) || 0);
+      const a = radians(dir);
+      const ux = Math.sin(a);
+      const uy = -Math.cos(a);
+      const x1 = cx + ux * 29;
+      const y1 = cy + uy * 29;
+      const x2 = cx - ux * 29;
+      const y2 = cy - uy * 29;
+      const vx = x2 - x1;
+      const vy = y2 - y1;
+      const len = Math.max(1, Math.hypot(vx, vy));
+      const nx = -vy / len;
+      const ny = vx / len;
+      const hx1 = x2 - vx / len * 13 + nx * 8;
+      const hy1 = y2 - vy / len * 13 + ny * 8;
+      const hx2 = x2 - vx / len * 13 - nx * 8;
+      const hy2 = y2 - vy / len * 13 - ny * 8;
+      const bx = cx - 95;
+      const by = cy - 42;
+      return '<g class="v7sept-v4-wind-indicator"><rect class="v7sept-v4-wind-box" x="' + bx + '" y="' + by + '" rx="14" ry="14" width="190" height="84"/>' +
+        '<line class="v7sept-v4-wind-line" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"/>' +
+        '<path class="v7sept-v4-wind-head" d="M ' + x2 + ' ' + y2 + ' L ' + hx1 + ' ' + hy1 + ' L ' + hx2 + ' ' + hy2 + ' Z"/>' +
+        '<text class="v7sept-v4-wind-label" x="' + (bx + 12) + '" y="' + (by + 25) + '">WIND FROM ' + String(Math.round(dir)).padStart(3, '0') + '°</text>' +
+        '<text class="v7sept-v4-wind-sub" x="' + (bx + 12) + '" y="' + (by + 74) + '">' + speed.toFixed(1) + ' kn · ' + escapeSvg(data.source || 'wind') + '</text></g>';
+    }
+
+    function mark(bounds, code, data, active, compact = false){
+      const onRoute = routeCodeSet().has(code);
+      if (code === 'EK' && !onRoute && bounds.mode !== 'full') return '';
+      const p = screenPoint(bounds, data);
+      if (!isVisible(p)) return '';
+      const coastal = data.group === 'coastal';
+      const radius = active ? 10 : coastal ? 8 : 5;
+      const cls = active ? 'active' : coastal ? 'coastal' : 'dbsc';
+      const special = code === 'IM' ? ' inflatable' : '';
+      const offset = labelOffsets[code] || [9, -8];
+      const zoom = (FULL.maxLat - FULL.minLat) / (bounds.maxLat - bounds.minLat);
+      const showLabel = active || onRoute || coastal || bounds.mode === 'bay' || (zoom > 2.2 && !compact);
+      let html = '<g class="' + (showLabel ? '' : 'v7sept-v5-hidden-mark') + '">' +
+        '<circle class="v7sept-v4-mark ' + cls + special + '" cx="' + p.x + '" cy="' + p.y + '" r="' + radius + '"/>' +
+        '<text class="v7sept-v4-code" x="' + p.x + '" y="' + (p.y + 0.5) + '" text-anchor="middle" dominant-baseline="middle">' + escapeSvg(code) + '</text>';
+      if (showLabel) {
+        html += '<text class="v7sept-v4-label ' + cls + '" x="' + (p.x + offset[0]) + '" y="' + (p.y + offset[1]) + '">' +
+          escapeSvg(code + ' · ' + data.name) + '</text>';
+      }
+      return html + '</g>';
+    }
+
+    function routeLayer(bounds, labelDistance = true){
+      const items = currentTargets();
+      if (items.length < 2) return '';
+      let html = '<defs><marker id="coastalActiveArrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="strokeWidth">' +
+        '<path class="v7sept-v4-route-arrow" d="M 0 0 L 9 4.5 L 0 9 z"/></marker></defs>';
+      for (let i = 0; i < items.length - 1; i++) {
+        const a = screenPoint(bounds, items[i].point);
+        const b = screenPoint(bounds, items[i + 1].point);
+        if (!isVisible(a, 130) && !isVisible(b, 130)) continue;
+        const navData = typeof nav === 'function' ? nav(items[i].point, items[i + 1].point) : null;
+        const type = navData && typeof legTypeFromBearing === 'function' ? legTypeFromBearing(navData.bearing, weather.dir) : '';
+        const midX = (a.x + b.x) / 2;
+        const midY = (a.y + b.y) / 2;
+        const angle = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
+        html += '<line class="v7sept-v4-route" x1="' + a.x + '" y1="' + a.y + '" x2="' + b.x + '" y2="' + b.y + '" marker-end="url(#coastalActiveArrow)"/>';
+        if (type) {
+          const label = type + (labelDistance && navData?.dist ? ' · ' + navData.dist.toFixed(1) + ' nm' : '');
+          html += '<g class="v7sept-v4-leg-pill ' + type.toLowerCase() + '" transform="translate(' + midX + ' ' + midY + ') rotate(' + angle + ')">' +
+            '<rect x="-45" y="-12" width="90" height="24" rx="12"/><text x="0" y="4" text-anchor="middle">' + escapeSvg(label) + '</text></g>';
+        }
+      }
+      return html;
+    }
+
+    function renderCoastal(){
+      const host = el('coastalNativeMap');
+      const svg = el('v50MapOverlay');
+      if (host) host.classList.add('v7sept-v4-coastal-map');
+      if (!svg) return;
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+      svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+      let html = background(state) + grid(state) + routeLayer(state, true);
+      const track = (tracker?.points || []).filter(isGeo).slice(-900);
+      if (track.length > 1) html += '<polyline class="v7sept-v4-track" points="' + pointList(state, track) + '"/>';
+      const activeCode = route?.[idx]?.code;
+      Object.entries(marks || {}).forEach(([code, data]) => {
+        if (code !== 'FIN' && isGeo(data)) html += mark(state, code, data, code === activeCode, true);
+      });
+      if ((gpsWanted || demoTimer) && isGeo(pos)) {
+        const boat = screenPoint(state, pos);
+        if (isVisible(boat)) {
+          html += '<circle class="v7sept-v4-boat" cx="' + boat.x + '" cy="' + boat.y + '" r="10"/>' +
+            '<text class="v7sept-v4-boat-label" x="' + (boat.x + 13) + '" y="' + (boat.y - 8) + '">GPS BOAT</text>';
+        }
+      }
+      html += wind(805, 92) +
+        '<text class="v7sept-v5-view-note" x="14" y="646">COASTAL 8 Sept v1 · drag / wheel / pinch · Home excludes East Kish unless route/full view needs it</text>';
+      svg.innerHTML = html;
+      updateStatus();
+      updateZoomLabel();
+    }
+
+    function renderTracker(){
+      const svg = el('trackMap');
+      if (!svg) return false;
+      svg.closest('.chart-map')?.classList.add('v7sept-v4-coastal-tracker');
+      const bounds = { ...HOME, mode: 'tracker' };
+      const points = currentTargets().map(target => target.point).filter(isGeo);
+      (tracker?.points || []).filter(isGeo).slice(-1200).forEach(point => points.push(point));
+      if (isGeo(pos)) points.push(pos);
+      if (points.length > 1) fitPoints(bounds, points, 'tracker');
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+      svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+      let html = background(bounds) + routeLayer(bounds, false);
+      const segments = typeof trackSegmentsForMapV40 === 'function'
+        ? trackSegmentsForMapV40(tracker?.points || [])
+        : [(tracker?.points || []).filter(isGeo)];
+      segments.forEach(segment => {
+        const visibleSegment = segment.filter(isGeo);
+        if (visibleSegment.length > 1) html += '<polyline class="v7sept-v4-track" points="' + pointList(bounds, visibleSegment) + '"/>';
+      });
+      const activeCode = route?.[idx]?.code;
+      Object.entries(marks || {}).forEach(([code, data]) => {
+        if (!isGeo(data)) return;
+        const onRoute = routeCodeSet().has(code);
+        const coastal = data.group === 'coastal';
+        if (!coastal && !onRoute && code !== 'O' && code !== 'H' && code !== 'V' && code !== 'N') return;
+        html += mark(bounds, code, data, code === activeCode, false);
+      });
+      if (isGeo(pos)) {
+        const boat = screenPoint(bounds, pos);
+        if (isVisible(boat)) {
+          html += '<circle class="v7sept-v4-boat" cx="' + boat.x + '" cy="' + boat.y + '" r="10"/>' +
+            '<text class="v7sept-v4-boat-label" x="' + (boat.x + 13) + '" y="' + (boat.y - 8) + '">GPS BOAT</text>';
+        }
+      }
+      html += wind(805, 92) + '<text class="v7sept-v4-tracker-note" x="14" y="646">COASTAL TRACKER 8 Sept v1 · route + recorded GPS track</text>';
+      svg.innerHTML = html;
+      return true;
+    }
+
+    function updateStatus(){
+      const status = el('v50CoastalStatus');
+      if (!status) return;
+      const eastKishText = routeUsesEastKish()
+        ? 'East Kish route: use Fit route or Full offshore for the whole leg.'
+        : 'Home view keeps East Kish out of the default frame.';
+      status.textContent = 'Coastal 8 Sept v1: drag to pan, wheel/pinch to zoom. ' + eastKishText;
+    }
+
+    function localSvgPoint(host, event){
+      const rect = host.getBoundingClientRect();
+      return {
+        x: (event.clientX - rect.left) / Math.max(1, rect.width) * W,
+        y: (event.clientY - rect.top) / Math.max(1, rect.height) * H
+      };
+    }
+
+    function pinchInfo(){
+      const active = [...pointers.values()];
+      if (active.length < 2) return null;
+      const a = active[0];
+      const b = active[1];
+      return {
+        dist: Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY),
+        mid: { clientX: (a.clientX + b.clientX) / 2, clientY: (a.clientY + b.clientY) / 2 }
+      };
+    }
+
+    function clearPointerState(host){
+      lastPointer = null;
+      pinchStart = null;
+      host.classList.remove('dragging');
+    }
+
+    function ensureControls(){
+      const coastalButton = el('v50MapCoastal');
+      if (coastalButton && !el('v7SeptV5MapFull')) {
+        const full = document.createElement('button');
+        full.className = 'secondary v7sept-v5-full-btn';
+        full.id = 'v7SeptV5MapFull';
+        full.type = 'button';
+        full.textContent = 'Full offshore';
+        coastalButton.insertAdjacentElement('afterend', full);
+      }
+      const controls = document.querySelector('.v50-coastal-controls');
+      if (controls && !controls.querySelector('.v7sept-v5-pan-hint')) {
+        const hint = document.createElement('span');
+        hint.className = 'v7sept-v5-pan-hint';
+        hint.textContent = 'Drag map · wheel/pinch zoom';
+        controls.appendChild(hint);
+      }
+    }
+
+    function wireMapInteraction(){
+      const host = el('coastalNativeMap');
+      if (!host || host.dataset.activeCoastalPan) return;
+      host.dataset.activeCoastalPan = '8sept-v1';
+      host.addEventListener('pointerdown', event => {
+        if (event.button && event.button !== 0) return;
+        host.setPointerCapture?.(event.pointerId);
+        pointers.set(event.pointerId, { clientX: event.clientX, clientY: event.clientY });
+        lastPointer = { clientX: event.clientX, clientY: event.clientY };
+        pinchStart = pinchInfo();
+        host.classList.add('dragging');
+        event.preventDefault();
+      });
+      host.addEventListener('pointermove', event => {
+        if (!pointers.has(event.pointerId)) return;
+        pointers.set(event.pointerId, { clientX: event.clientX, clientY: event.clientY });
+        if (pointers.size >= 2) {
+          const now = pinchInfo();
+          if (now && pinchStart) {
+            panBy(now.mid.clientX - pinchStart.mid.clientX, now.mid.clientY - pinchStart.mid.clientY);
+            const p = localSvgPoint(host, now.mid);
+            zoomAt(now.dist / Math.max(1, pinchStart.dist), p.x, p.y);
+          }
+          pinchStart = now;
+          return;
+        }
+        if (lastPointer) {
+          panBy(event.clientX - lastPointer.clientX, event.clientY - lastPointer.clientY);
+          renderCoastal();
+          lastPointer = { clientX: event.clientX, clientY: event.clientY };
+        }
+      });
+      ['pointerup', 'pointercancel', 'pointerleave'].forEach(type => {
+        host.addEventListener(type, event => {
+          pointers.delete(event.pointerId);
+          if (!pointers.size) clearPointerState(host);
+          else pinchStart = pinchInfo();
+        });
+      });
+      host.addEventListener('wheel', event => {
+        const p = localSvgPoint(host, event);
+        zoomAt(event.deltaY < 0 ? 1.16 : 1 / 1.16, p.x, p.y);
+        event.preventDefault();
+      }, { passive: false });
+    }
+
+    const controlActions = {
+      v50MapBay: showBay,
+      v50MapCoastal: showHome,
+      v7SeptV5MapFull: showFull,
+      v50MapFitRoute: fitRoute,
+      v50MapZoomIn: () => zoomAt(1.16),
+      v50MapZoomOut: () => zoomAt(1 / 1.16),
+      v50MapBoat: showBoat
+    };
+
+    function interceptControls(){
+      if (document.documentElement.dataset.activeCoastalControls) return;
+      document.documentElement.dataset.activeCoastalControls = '8sept-v1';
+      document.addEventListener('click', event => {
+        const button = event.target.closest?.('button');
+        if (!button || !controlActions[button.id]) return;
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        controlActions[button.id]();
+      }, true);
+    }
+
+    function installRuntimeOverrides(){
+      window.renderNativeMapV50 = renderCoastal;
+      window.renderOverlayV50 = renderCoastal;
+      window.renderTilesV50 = function(){
+        const tileStage = el('v50TileStage');
+        if (tileStage) tileStage.innerHTML = '';
+      };
+      window.renderFallbackV50 = function(){
+        const fallback = el('v50MapFallback');
+        if (fallback) fallback.innerHTML = '';
+      };
+      window.wireMapDragV50 = wireMapInteraction;
+
+      const previousRenderMap = typeof window.renderMap === 'function' ? window.renderMap : null;
+      window.renderMap = function(){
+        if (previousRenderMap) previousRenderMap();
+        if (typeof isFreestyle === 'function' && isFreestyle()) renderCoastal();
+      };
+
+      const previousFreestyleMap = typeof window.renderFreestyleMap === 'function' ? window.renderFreestyleMap : null;
+      window.renderFreestyleMap = function(){
+        if (previousFreestyleMap) previousFreestyleMap();
+        renderCoastal();
+      };
+
+      const previousTrackerMap = typeof window.renderTrackerMap === 'function' ? window.renderTrackerMap : null;
+      window.renderTrackerMap = function(){
+        if (typeof isFreestyle === 'function' && isFreestyle()) {
+          renderTracker();
+          return;
+        }
+        el('trackMap')?.closest('.chart-map')?.classList.remove('v7sept-v4-coastal-tracker');
+        if (previousTrackerMap) previousTrackerMap();
+      };
+
+      const previousOpenTab = typeof window.openTab === 'function' ? window.openTab : null;
+      window.openTab = function(name){
+        if (previousOpenTab) previousOpenTab(name);
+        if (name === 'freestyle') requestAnimationFrame(() => {
+          ensureControls();
+          wireMapInteraction();
+          renderCoastal();
+        });
+        if (name === 'tracker') requestAnimationFrame(window.renderTrackerMap);
+      };
+
+      const previousUpdate = typeof window.update === 'function' ? window.update : null;
+      window.update = function(){
+        if (previousUpdate) previousUpdate();
+        requestAnimationFrame(() => {
+          if (typeof isFreestyle === 'function' && isFreestyle()) {
+            renderCoastal();
+            renderTracker();
+          }
+        });
+      };
+    }
+
+    function init(){
+      setVersionLabels();
+      ensureControls();
+      interceptControls();
+      wireMapInteraction();
+      installRuntimeOverrides();
+      showHome();
+      requestAnimationFrame(() => {
+        ensureControls();
+        wireMapInteraction();
+        renderCoastal();
+      });
+      window.addEventListener('resize', () => requestAnimationFrame(() => {
+        renderCoastal();
+        if (typeof isFreestyle === 'function' && isFreestyle()) renderTracker();
+      }));
+    }
+
+    return {
+      init,
+      render: renderCoastal,
+      renderTracker,
+      showHome,
+      showBay,
+      showFull,
+      fitRoute,
+      zoomAt,
+      panBy,
+      state
+    };
+  })();
+
+  window.SparklesGPT.active.coastalMap = CoastalMap;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', CoastalMap.init, { once: true });
+  } else {
+    CoastalMap.init();
+  }
+})();
+</script>
+<script>
+/* ===== 10 Sept 2026 v1 ACTIVE MODULE: Coastal course presets ===== */
+(function(){
+  window.SparklesGPT = window.SparklesGPT || {};
+  window.SparklesGPT.active = window.SparklesGPT.active || {};
+
+  const CoastalCourses = (function(){
+    const VERSION_TITLE = 'SparklesGPT · DBSC Sailing · 10 Sept 2026 · v1';
+    const VERSION_LABEL = 'DBSC Sailing App · 10 Sept 2026 · v1';
+    const STORAGE_KEY = 'sparklesCoastalCoursePreset';
+    const MARK_DEFS = {
+      MG: { name: 'Muglins', lat: 53.271300, lon: -6.071800, group: 'coastal', desc: 'Muglins island / coastal rounding reference' },
+      IM: { name: 'Inflatable Mark', lat: 53.275985, lon: -6.074676, group: 'coastal', desc: 'Large orange inflatable east of the Muglins' }
+    };
+    const COURSES = {
+      cruiser_0_1: {
+        label: 'Cruiser 0/1',
+        route: [
+          { code: 'S', round: 's' },
+          { code: 'MG', round: 's' },
+          { code: 'BO', round: 'p' },
+          { code: 'IM', round: 'p' },
+          { code: 'R', round: 's' }
+        ]
+      },
+      all_other: {
+        label: 'All other classes',
+        route: [
+          { code: 'S', round: 's' },
+          { code: 'MG', round: 's' },
+          { code: 'SO', round: 'p' },
+          { code: 'IM', round: 'p' },
+          { code: 'R', round: 's' }
+        ]
+      }
+    };
+
+    function byId(id){ return document.getElementById(id); }
+    function roundLabel(round){ return round === 's' ? 'stbd' : 'port'; }
+    function courseLine(key){
+      const preset = COURSES[key];
+      if (!preset) return 'Manual Coastal / Freeform: add and edit marks below.';
+      return preset.route.map(item => {
+        const mark = marks?.[item.code];
+        return (mark?.name || item.code) + ' to ' + roundLabel(item.round);
+      }).join(' > ');
+    }
+
+    function setVersionLabels(){
+      document.title = VERSION_TITLE;
+      const brand = document.querySelector('.brand small');
+      if (brand) brand.textContent = VERSION_LABEL;
+    }
+
+    function ensureStyles(){
+      if (byId('coastalCoursePresetStyles')) return;
+      const style = document.createElement('style');
+      style.id = 'coastalCoursePresetStyles';
+      style.textContent = [
+        '.coastal-course-preset{margin:12px 0;padding:12px;border:1px solid #2f5366;border-radius:12px;background:#071a24}',
+        '.coastal-course-preset-grid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:end}',
+        '.coastal-course-preset .note{margin-top:8px}',
+        '.v7sept-v4-mark.inflatable{fill:#ff8a18;stroke:#1c1c1c;stroke-width:2.5}',
+        'body.light-mode .coastal-course-preset{background:#fff;border-color:#adc3cf}',
+        '@media(max-width:700px){.coastal-course-preset-grid{grid-template-columns:1fr}.coastal-course-preset-grid button{width:100%}}'
+      ].join('');
+      document.head.appendChild(style);
+    }
+
+    function ensureRaceLabels(){
+      const opt = byId('raceType')?.querySelector('option[value="freestyle"]');
+      if (opt) opt.textContent = 'Coastal / Freeform';
+    }
+
+    function ensureMarks(){
+      if (typeof marks === 'undefined' || !marks) return;
+      Object.assign(marks, MARK_DEFS);
+      if (typeof MARK_APPEARANCE !== 'undefined' && MARK_APPEARANCE) {
+        Object.assign(MARK_APPEARANCE, {
+          MG: { type: 'generic', bands: ['#4f5658'], desc: 'Muglins island / coastal rounding reference' },
+          IM: { type: 'generic', bands: ['#ff8a18'], desc: 'Large orange inflatable mark' }
+        });
+      }
+    }
+
+    function ensurePanel(){
+      const banner = document.querySelector('.freestyle-active-banner');
+      if (!banner || byId('coastalCoursePresetPanel')) return;
+      banner.insertAdjacentHTML('afterend',
+        '<div class="coastal-course-preset" id="coastalCoursePresetPanel">' +
+          '<div class="coastal-course-preset-grid">' +
+            '<div><label for="coastalCoursePreset">Coastal course</label>' +
+              '<select id="coastalCoursePreset">' +
+                '<option value="">Manual / freeform</option>' +
+                '<option value="cruiser_0_1">Cruiser 0/1</option>' +
+                '<option value="all_other">All other classes</option>' +
+              '</select></div>' +
+            '<button class="primary" id="coastalCourseLoadBtn" type="button">Load Coastal Course</button>' +
+          '</div>' +
+          '<div class="note" id="coastalCoursePresetNote"></div>' +
+        '</div>');
+      const select = byId('coastalCoursePreset');
+      const saved = sessionStorage.getItem(STORAGE_KEY) || '';
+      if (select && COURSES[saved]) select.value = saved;
+      select?.addEventListener('change', updateNote);
+      byId('coastalCourseLoadBtn')?.addEventListener('click', () => loadPreset(select?.value || ''));
+      updateNote();
+    }
+
+    function updateNote(){
+      const note = byId('coastalCoursePresetNote');
+      const select = byId('coastalCoursePreset');
+      if (note) note.textContent = courseLine(select?.value || '');
+    }
+
+    function rerender(){
+      if (typeof populateFreestyleMarks === 'function') populateFreestyleMarks();
+      if (typeof updateFreestyleMarkDetail === 'function') updateFreestyleMarkDetail();
+      if (typeof renderFreestyleBuilder === 'function') renderFreestyleBuilder();
+      if (typeof renderRoute === 'function') renderRoute();
+      if (typeof renderFullCourse === 'function') renderFullCourse();
+      if (typeof renderFreestyleMap === 'function') renderFreestyleMap();
+      if (typeof renderSailSteer === 'function') renderSailSteer();
+      if (typeof renderTrackerMap === 'function') renderTrackerMap();
+      window.SparklesGPT?.active?.coastalMap?.render?.();
+    }
+
+    function loadPreset(key){
+      const preset = COURSES[key];
+      if (!preset) {
+        sessionStorage.removeItem(STORAGE_KEY);
+        updateNote();
+        return;
+      }
+      ensureMarks();
+      const raceType = byId('raceType');
+      if (raceType) raceType.value = 'freestyle';
+      try {
+        freestyleRoute = preset.route.map(item => ({ ...item }));
+        idx = 0;
+        delete marks.FIN;
+      } catch (err) {
+        console.warn('Could not load Coastal Course preset', err);
+        return;
+      }
+      if (byId('freeFinishType')) byId('freeFinishType').value = 'none';
+      if (typeof updateFreestyleFinishUI === 'function') updateFreestyleFinishUI();
+      if (typeof updateRaceTypeUI === 'function') updateRaceTypeUI();
+      if (typeof activateFreestyleCourse === 'function') activateFreestyleCourse(false);
+      if (byId('courseStatus')) byId('courseStatus').textContent = 'Coastal · ' + preset.label;
+      if (byId('freeActiveStatus')) byId('freeActiveStatus').textContent = 'ACTIVE · ' + preset.label + ' · ' + preset.route.length + ' marks';
+      sessionStorage.setItem(STORAGE_KEY, key);
+      if (typeof saveSailingState === 'function') saveSailingState();
+      if (typeof saveRaceSession === 'function') saveRaceSession();
+      rerender();
+      window.SparklesGPT?.active?.coastalMap?.fitRoute?.();
+      updateNote();
+    }
+
+    function init(){
+      setVersionLabels();
+      ensureStyles();
+      ensureRaceLabels();
+      ensureMarks();
+      ensurePanel();
+      rerender();
+    }
+
+    return {
+      init,
+      loadPreset,
+      courses: COURSES,
+      marks: MARK_DEFS
+    };
+  })();
+
+  window.SparklesGPT.active.coastalCourses = CoastalCourses;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', CoastalCourses.init, { once: true });
+  } else {
+    CoastalCourses.init();
+  }
 })();
 </script></body></html>
