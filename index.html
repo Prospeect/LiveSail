@@ -13,6 +13,8 @@ SparklesGPT / DBSC Sailing revision history
 - 11 Sept 2026 v1: Replaces the DBSC course letter/number button strips with two native dropdowns for better high-zoom Samsung Chrome behaviour, and adds an app text-size setting.
 - 11 Sept 2026 v2: Increases the app text-size steps so Large and Extra large are much more visibly different.
 - 11 Sept 2026 v3: Makes the app text-size steps bigger again: Large 1.45x and Extra large 1.80x.
+- 11 Sept 2026 v4: Reworks the Setup screen into the compact mobile layout with Race Type, Class / Start, derived Start Information, clearer selected-course contrast, Race Week cards, and reflowing text-size steps.
+- 11 Sept 2026 v5: Fixes Light mode Setup dropdown contrast after the v4 layout update.
 
 Maintenance notes:
 - Current active Coastal code is in the late active module: window.SparklesGPT.active.coastalMap.
@@ -21,7 +23,7 @@ Maintenance notes:
 - Older v50/v52/v4/v5 Coastal blocks are historical compatibility layers. Avoid editing them unless intentionally recovering an older behaviour.
 - For the next Coastal change, edit only the final active module and this revision history.
 -->
-<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/><meta content="#06111a" name="theme-color"/><title>SparklesGPT · DBSC Sailing · 11 Sept 2026 · v3</title><style>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/><meta content="#06111a" name="theme-color"/><title>SparklesGPT · DBSC Sailing · 11 Sept 2026 · v5</title><style>
 :root{--bg:#06111a;--panel:#0b1b27;--panel2:#102735;--text:#f4f8fb;--muted:#91a9b9;--accent:#36a3ff;--good:#62d86e;--warn:#ffcc4d;--red:#ff6868;--line:#1e3b4d}*{box-sizing:border-box}html{background:var(--bg)}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:linear-gradient(160deg,#0d2638,#06111a 40%);color:var(--text);min-height:100vh}button,select,input{font:inherit}.topbar{position:sticky;top:0;z-index:50;background:#07131df2;backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}.brandrow{max-width:1150px;margin:auto;padding:12px 16px 8px;display:flex;gap:12px;align-items:center;justify-content:space-between}.brand h1{font-size:20px;margin:0}.brand small{color:var(--muted)}.topstatus{display:flex;gap:7px;align-items:center}.mini{font-size:11px;padding:7px 9px;background:#102532;border:1px solid var(--line);border-radius:999px}.tabs{max-width:1150px;margin:auto;display:flex;gap:5px;overflow-x:auto;padding:4px 12px 10px;-webkit-overflow-scrolling:touch;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab-btn{white-space:nowrap;border:0;background:#102532;color:#b8d0de;padding:9px 13px;border-radius:12px;font-weight:800;font-size:12px}.tab-btn.active{background:var(--accent);color:#001522}.content{max-width:1150px;margin:auto;padding:18px 16px 70px}.tab-panel{display:none}.tab-panel.active{display:block}.panel{background:#0a1924e8;border:1px solid var(--line);border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 18px 50px #0004}.panel h2{font-size:22px;margin:0 0 6px}.panel h3{margin:0 0 8px}.lead{color:var(--muted);margin:0 0 16px;line-height:1.45}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#b4c8d5;margin:12px 0 5px}select,input{width:100%;background:#102532;color:white;border:1px solid #2b4d61;border-radius:12px;padding:11px 12px}.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}button{border:0;border-radius:13px;padding:11px 14px;font-weight:800;cursor:pointer}.primary{background:var(--accent);color:#001522}.secondary{background:#173143;color:#dff2ff}.danger{background:#47252b;color:#ffdfe3}.statuscard,.metric{background:#0e2330;border:1px solid var(--line);border-radius:16px;padding:14px}.metric small,.statuscard small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07em}.metric b{display:block;font-size:28px;margin-top:4px}.metric .sub{font-size:12px;color:var(--muted);margin-top:4px}.hero-nav{display:grid;grid-template-columns:1.3fr .7fr;gap:14px}.nextmark{background:linear-gradient(135deg,#102d40,#0c1d29);border:1px solid #28526b;border-radius:22px;padding:20px}.nextmark .code{font-size:34px;font-weight:900}.bigbearing{font-size:58px;font-weight:900;line-height:1}.arrow{font-size:52px;color:var(--accent);display:inline-block}.route-list{display:flex;gap:7px;flex-wrap:wrap}.chip{padding:7px 10px;border-radius:999px;background:#142b39;font-size:12px}.chip.next{background:#174566;color:#d7efff}.chip.port{border-bottom:2px solid var(--red)}.chip.starboard{border-bottom:2px solid var(--good)}.course-table-wrap{overflow:auto;max-width:100%;border:1px solid var(--line);border-radius:14px;-webkit-overflow-scrolling:touch}.course-table{width:max-content;min-width:900px;border-collapse:separate;border-spacing:0;font-size:12px}.course-table th,.course-table td{padding:9px;border-bottom:1px solid #163141;white-space:nowrap;background:#081720}.course-table th{background:#102936;color:#aac7d7;position:sticky;top:0}.course-table tr.active td{background:#12364e}.porttxt{color:#ff9696;font-weight:800}.startxt{color:#8aeb97;font-weight:800}.mapwrap{background:#06121b;border:1px solid var(--line);border-radius:20px;overflow:hidden}.mapwrap svg{display:block;width:100%;height:auto;min-height:420px}.maplegend{display:flex;flex-wrap:wrap;gap:12px;padding:10px 14px;color:var(--muted);font-size:12px}.guidebox{text-align:center;padding:28px 16px;background:linear-gradient(150deg,#0c2634,#071720);border:1px solid var(--line);border-radius:22px}.guidebox .main{font-size:38px;font-weight:900;color:var(--good)}.guidebox .detail{color:#c4dbe8;margin-top:8px}.windarrow{font-size:70px;color:var(--accent)}.tide-events{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tide-state{font-weight:900;color:var(--accent);font-size:26px}.progress{height:15px;border-radius:999px;background:#102532;overflow:hidden}.progress>div{height:100%;background:linear-gradient(90deg,#36a3ff,#62d86e);width:0}.timer{font-size:32px;font-weight:900;letter-spacing:.06em}.note{color:var(--muted);font-size:12px;line-height:1.5}.testing summary{cursor:pointer;color:#8aa7b7;font-weight:700}.mobileonly{display:none}@media(max-width:760px){.brandrow{align-items:flex-start}.topstatus{display:none}.content{padding:12px 10px 60px}.panel{padding:15px;border-radius:16px}.grid2,.grid3,.grid4,.hero-nav{grid-template-columns:1fr}.mapwrap svg{min-height:330px}.bigbearing{font-size:46px}.metric b{font-size:24px}.tabs{padding-left:8px;padding-right:8px}.mobileonly{display:block}.course-table{min-width:820px}}
 
 .chart-map{position:relative;width:100%;background:#d8f2ff;border:1px solid var(--line);border-radius:18px;overflow:hidden}
@@ -832,7 +834,7 @@ body.light-mode .v51-voice-transcript small{color:#405d6c!important}
 .v7sept-v4-route-arrow{fill:#1688ff;stroke:#fff;stroke-width:1.2}.v7sept-v4-leg-pill rect{fill:rgba(255,255,255,.92);stroke:#1264a3;stroke-width:1.1}.v7sept-v4-leg-pill text{font-size:10px;font-weight:1000;fill:#092435;paint-order:stroke;stroke:#fff;stroke-width:2px}.v7sept-v4-leg-pill.beat rect{stroke:#0079c9}.v7sept-v4-leg-pill.reach rect{stroke:#b88400}.v7sept-v4-leg-pill.run rect{stroke:#087a35}.chart-map.v7sept-v4-coastal-tracker{height:min(62vh,620px);min-height:360px;background:#95d7fb!important}.chart-map.v7sept-v4-coastal-tracker img{display:none!important}.chart-map.v7sept-v4-coastal-tracker svg{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;display:block!important;background:#95d7fb!important}.v7sept-v4-tracker-note{fill:#173a49;font-size:10px;font-weight:900;paint-order:stroke;stroke:#e9f6fb;stroke-width:2px}body.light-mode .v7sept-v4-leg-pill text{fill:#07131d!important;stroke:#fff!important}
 /* ===== 10 Sept 2026 v3: active Coastal module support styles ===== */
 .v7sept-v4-coastal-map{cursor:grab!important;touch-action:none!important}.v7sept-v4-coastal-map.dragging{cursor:grabbing!important}.v7sept-v5-full-btn{background:#21465d!important;color:#e9f7ff!important}.v7sept-v5-view-note{fill:#173a49;font-size:10px;font-weight:900;paint-order:stroke;stroke:#e9f6fb;stroke-width:2px}.v7sept-v5-hidden-mark{opacity:.55}.v7sept-v5-pan-hint{font-size:9px;color:var(--muted);font-weight:900;padding-left:4px}
-</style></head><body><header class="topbar"><div class="brandrow"><div class="brand"><h1>⛵ SparklesGPT</h1><small>DBSC Sailing App · 11 Sept 2026 · v3</small></div><div class="topstatus"><span class="mini" id="clock">--:--</span><span class="mini">GPS <b id="gpsStatus">Idle</b></span><span class="mini">Wind <b id="weatherStatus">—</b></span><span class="mini">Course <b id="courseStatus">—</b></span></div><button class="v45-theme-toggle" id="v45ThemeToggle" type="button" aria-label="Toggle light or dark display">&#9728; Light</button></div><nav class="tabs">
+</style></head><body><header class="topbar"><div class="brandrow"><div class="brand"><h1>⛵ SparklesGPT</h1><small>DBSC Sailing App · 11 Sept 2026 · v5</small></div><div class="topstatus"><span class="mini" id="clock">--:--</span><span class="mini">GPS <b id="gpsStatus">Idle</b></span><span class="mini">Wind <b id="weatherStatus">—</b></span><span class="mini">Course <b id="courseStatus">—</b></span></div><button class="v45-theme-toggle" id="v45ThemeToggle" type="button" aria-label="Toggle light or dark display">&#9728; Light</button></div><nav class="tabs">
 <button class="tab-btn active" data-tab="selection">Setup</button>
 <button class="tab-btn" data-tab="startmarks">Course</button>
 <button class="tab-btn" data-tab="freestyle" id="freestyleTabBtn">Coastal</button>
@@ -3688,7 +3690,7 @@ setTimeout(()=>{renderMobileCourseCardsV48();updateMarkNavV48()},30);
   if(typeof renderCompetitionMap==='function'){const before=renderCompetitionMap;renderCompetitionMap=function(){before();appendWind(byId('competitionMap'))}}
   if(typeof update==='function'){const before=update;update=function(){before();updateVmg();requestAnimationFrame(()=>{appendWind(byId('courseMap'));appendWind(byId('trackMap'))})}}
   const oldOpen=typeof openTab==='function'?openTab:null;if(oldOpen){openTab=function(name){oldOpen(name);if(name==='freestyle')requestAnimationFrame(()=>{if(typeof renderFreestyleMap==='function')renderFreestyleMap()})}}
-  function init(){document.querySelector('.brand small')&&(document.querySelector('.brand small').textContent='DBSC Sailing App · 11 Sept 2026 · v3');byId('voiceStatus')&&(byId('voiceStatus').style.display='none');updateVmg();requestAnimationFrame(()=>{if(typeof renderMap==='function')renderMap();if(typeof renderTrackerMap==='function')renderTrackerMap();if(typeof renderFreestyleMap==='function')renderFreestyleMap()})}
+  function init(){document.querySelector('.brand small')&&(document.querySelector('.brand small').textContent='DBSC Sailing App · 11 Sept 2026 · v5');byId('voiceStatus')&&(byId('voiceStatus').style.display='none');updateVmg();requestAnimationFrame(()=>{if(typeof renderMap==='function')renderMap();if(typeof renderTrackerMap==='function')renderTrackerMap();if(typeof renderFreestyleMap==='function')renderFreestyleMap()})}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
   if('ResizeObserver' in window){const h=byId('coastalNativeMap');if(h)new ResizeObserver(()=>requestAnimationFrame(()=>{if(typeof renderFreestyleMap==='function')renderFreestyleMap()})).observe(h)}
 })();
@@ -3794,7 +3796,7 @@ window.SparklesGPTUseActiveCoastalModule = true;
   const oldTracker=typeof renderTrackerMap==='function'?renderTrackerMap:null;renderTrackerMap=function(){if(typeof isFreestyle==='function'&&isFreestyle()){renderTrackerV5();return}const svg=byId('trackMap');svg?.closest('.chart-map')?.classList.remove('v7sept-v4-coastal-tracker');if(oldTracker)oldTracker()};
   const oldOpen=typeof openTab==='function'?openTab:null;openTab=function(name){if(oldOpen)oldOpen(name);if(name==='freestyle')requestAnimationFrame(()=>{ensureControls();wireMap();renderCoastalV5()});if(name==='tracker')requestAnimationFrame(renderTrackerMap)};
   const oldUpdate=typeof update==='function'?update:null;update=function(){if(oldUpdate)oldUpdate();requestAnimationFrame(()=>{if(typeof isFreestyle==='function'&&isFreestyle()){renderCoastalV5();renderTrackerV5()}})};
-  function init(){document.title='SparklesGPT · DBSC Sailing · 11 Sept 2026 · v3';const b=document.querySelector('.brand small');if(b)b.textContent='DBSC Sailing App · 11 Sept 2026 · v3';ensureControls();wireMap();setHome()}
+  function init(){document.title='SparklesGPT · DBSC Sailing · 11 Sept 2026 · v5';const b=document.querySelector('.brand small');if(b)b.textContent='DBSC Sailing App · 11 Sept 2026 · v5';ensureControls();wireMap();setHome()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
   requestAnimationFrame(()=>{ensureControls();wireMap();renderCoastalV5()});
   window.addEventListener('resize',()=>requestAnimationFrame(()=>{renderCoastalV5();if(typeof isFreestyle==='function'&&isFreestyle())renderTrackerV5()}));
@@ -3810,8 +3812,8 @@ window.SparklesGPTUseActiveCoastalModule = true;
   window.SparklesGPT.active = window.SparklesGPT.active || {};
 
   const CoastalMap = (function(){
-    const VERSION_TITLE = 'SparklesGPT · DBSC Sailing · 11 Sept 2026 · v3';
-    const VERSION_LABEL = 'DBSC Sailing App · 11 Sept 2026 · v3';
+    const VERSION_TITLE = 'SparklesGPT · DBSC Sailing · 11 Sept 2026 · v5';
+    const VERSION_LABEL = 'DBSC Sailing App · 11 Sept 2026 · v5';
     const W = 940;
     const H = 660;
     const FULL = { minLat: 53.160, maxLat: 53.405, minLon: -6.250, maxLon: -5.450 };
@@ -4458,8 +4460,8 @@ window.SparklesGPTUseActiveCoastalModule = true;
   window.SparklesGPT.active = window.SparklesGPT.active || {};
 
   const CoastalCourses = (function(){
-    const VERSION_TITLE = 'SparklesGPT · DBSC Sailing · 11 Sept 2026 · v3';
-    const VERSION_LABEL = 'DBSC Sailing App · 11 Sept 2026 · v3';
+    const VERSION_TITLE = 'SparklesGPT · DBSC Sailing · 11 Sept 2026 · v5';
+    const VERSION_LABEL = 'DBSC Sailing App · 11 Sept 2026 · v5';
     const STORAGE_KEY = 'sparklesCoastalCoursePreset';
     const MARK_DEFS = {
       MG: { name: 'Muglins', lat: 53.271300, lon: -6.071800, group: 'coastal', desc: 'Muglins island / coastal rounding reference' },
@@ -4636,23 +4638,31 @@ window.SparklesGPTUseActiveCoastalModule = true;
 })();
 </script>
 <script>
-/* ===== 11 Sept 2026 v3 ACTIVE MODULE: setup course dropdowns and app text size ===== */
+/* ===== 11 Sept 2026 v5 ACTIVE MODULE: setup screen layout, class/start dropdowns and app text size ===== */
 (function(){
   window.SparklesGPT = window.SparklesGPT || {};
   window.SparklesGPT.active = window.SparklesGPT.active || {};
 
   const SetupAccessibility = (function(){
-    const VERSION_TITLE = 'SparklesGPT · DBSC Sailing · 11 Sept 2026 · v3';
-    const VERSION_LABEL = 'DBSC Sailing App · 11 Sept 2026 · v3';
+    const VERSION_TITLE = 'SparklesGPT · DBSC Sailing · 11 Sept 2026 · v5';
+    const VERSION_LABEL = 'DBSC Sailing App · 11 Sept 2026 · v5';
     const TEXT_SIZE_KEY = 'sparklesAppTextSize';
+    const CLASS_START_KEY = 'sparklesClassStartV11';
     const sizes = {
-      normal: { label: 'Normal', scale: '1' },
-      large: { label: 'Large', scale: '1.45' },
-      xlarge: { label: 'Extra large', scale: '1.80' }
+      normal: { label: 'Normal', scale: '1', ui: '16px', control: '15px', route: '20px' },
+      large: { label: 'Large', scale: '1.65', ui: '18px', control: '18px', route: '25px' },
+      xlarge: { label: 'Extra large', scale: '2.20', ui: '21px', control: '21px', route: '31px' }
     };
     let wiringDone = false;
+    let classStartWired = false;
+    let raceWeekWired = false;
+    let syncingClassStart = false;
+    let hooksDone = false;
 
     function byId(id){ return document.getElementById(id); }
+    function esc(value){
+      return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
     function courseParts(value){
       const match = String(value || '').match(/^([A-Z]+)(\d+)$/);
       return match ? { letter: match[1], number: match[2] } : { letter: '', number: '' };
@@ -4685,25 +4695,230 @@ window.SparklesGPTUseActiveCoastalModule = true;
       const style = document.createElement('style');
       style.id = 'setupAccessibilityStyles';
       style.textContent = [
-        'html{--app-text-scale:1}',
-        'html[data-app-text-size="large"]{--app-text-scale:1.45}',
-        'html[data-app-text-size="xlarge"]{--app-text-scale:1.80}',
-        'html[data-app-text-size] body{font-size:calc(16px * var(--app-text-scale))}',
-        'html[data-app-text-size] select,html[data-app-text-size] input,html[data-app-text-size] button{font-size:calc(14px * var(--app-text-scale))}',
-        'html[data-app-text-size] label{font-size:calc(11px * var(--app-text-scale))}',
-        'html[data-app-text-size] .tab-btn{font-size:calc(12px * var(--app-text-scale));line-height:1.15}',
-        'html[data-app-text-size] .mini{font-size:calc(11px * var(--app-text-scale))}',
-        'html[data-app-text-size] .note,html[data-app-text-size] .lead{font-size:calc(12px * var(--app-text-scale))}',
-        '.v11-course-dropdowns{display:grid;grid-template-columns:minmax(0,1fr) minmax(92px,.55fr);gap:8px;align-items:end;margin:2px 0 4px}',
+        'html{--app-text-scale:1;--app-ui-font:16px;--app-control-font:15px;--app-route-font:20px;--app-label-font:13px;--app-note-font:13px;--app-tab-font:13px;--app-mini-font:11px;--app-card-label-font:13px}',
+        'html[data-app-text-size="large"]{--app-text-scale:1.65;--app-ui-font:18px;--app-control-font:18px;--app-route-font:25px;--app-label-font:16px;--app-note-font:16px;--app-tab-font:17px;--app-mini-font:14px;--app-card-label-font:16px}',
+        'html[data-app-text-size="xlarge"]{--app-text-scale:2.20;--app-ui-font:21px;--app-control-font:21px;--app-route-font:31px;--app-label-font:19px;--app-note-font:18px;--app-tab-font:20px;--app-mini-font:16px;--app-card-label-font:19px}',
+        'html[data-app-text-size] body{font-size:var(--app-ui-font)}',
+        'html[data-app-text-size] select,html[data-app-text-size] input,html[data-app-text-size] button{font-size:var(--app-control-font);line-height:1.15}',
+        'html[data-app-text-size] label{font-size:var(--app-label-font);line-height:1.15}',
+        'html[data-app-text-size] .tab-btn{font-size:var(--app-tab-font);line-height:1.15}',
+        'html[data-app-text-size] .mini{font-size:var(--app-mini-font)}',
+        'html[data-app-text-size] .note,html[data-app-text-size] .lead{font-size:var(--app-note-font)}',
+        '.v11-setup-panel{position:relative;overflow:visible}',
+        '.v11-setup-panel>h2{font-size:clamp(28px,6vw,44px)!important;margin-bottom:12px!important}',
+        '.v11-ready-banner{display:none;align-items:center;gap:12px;margin:4px 0 14px;padding:14px 16px;border:1px solid #89d7ac;border-radius:16px;background:linear-gradient(135deg,rgba(55,198,117,.20),rgba(55,198,117,.08));color:#dfffee;font-size:clamp(17px,2.4vw,24px);font-weight:1000}',
+        '.v11-ready-banner.valid{display:flex}.v11-ready-banner i{display:flex;align-items:center;justify-content:center;flex:0 0 auto;width:42px;height:42px;border-radius:50%;background:#0a8a49;color:#fff;font-style:normal;font-size:28px}',
+        '.v11-setup-panel .v45-course-banner{display:grid!important;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:14px;margin:0 0 18px!important;padding:17px 18px!important;border-radius:16px!important;background:linear-gradient(135deg,#081923,#0b2537)!important}',
+        '.v11-course-heading{display:flex;align-items:flex-start;gap:12px;min-width:0}.v11-course-flag{font-size:27px;line-height:1;color:#4aaeff}.v11-course-title{font-size:clamp(22px,3.6vw,38px);font-weight:1000;line-height:1.12;color:#f8fbff}.v11-course-code{font-size:clamp(16px,2.5vw,25px);font-weight:1000;line-height:1.25;margin-top:4px;color:#f8fbff}.v11-course-route{display:block!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;max-width:none!important;margin-top:8px!important;font-size:var(--app-route-font)!important;font-weight:1000!important;line-height:1.28!important;color:#4ea3ff!important;letter-spacing:.01em}.v11-course-route.empty{color:var(--muted)!important}',
+        '.v11-setup-panel #v41OpenCourseBtn{align-self:center;white-space:nowrap;padding:14px 18px!important;border-radius:14px!important}',
+        '.v11-setup-panel .v45-setup-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px!important;align-items:start!important;margin-top:2px}',
+        '.v11-setup-panel .v45-control{min-width:0}.v11-setup-panel .v45-control label{display:flex;align-items:center;gap:7px;margin:0 0 7px!important;font-size:var(--app-label-font)!important;letter-spacing:0!important;text-transform:none!important;color:#cfe3ef!important;font-weight:900}',
+        '.v11-setup-panel .v45-control select,.v11-setup-panel .v45-control input{min-height:54px!important;padding:12px 14px!important;border-radius:13px!important;font-weight:900;background:#102532;border-color:#5d8498}',
+        '.v11-setup-panel .v45-fixed-fields{display:block!important;min-width:0;grid-column:1/-1}.v11-setup-panel .v11-hidden-source{display:none!important}.v11-setup-panel .v45-warning{display:none!important}',
+        '.v11-class-control{grid-column:auto}.v11-class-sub{font-size:var(--app-note-font);color:#bdd1dd;margin:9px 2px 0;line-height:1.35}',
+        '.v11-course-dropdowns{display:grid;grid-template-columns:minmax(0,1fr) minmax(120px,.62fr);gap:14px;align-items:end;margin:0}',
         '.v11-course-dropdowns label{margin-top:0}',
         '.v11-course-dropdowns select{min-width:0}',
         '.v45-course-picker .v45-picker-row{display:none!important}',
         '.v45-course-picker .v45-native-course{display:none!important}',
-        '.v45-course-picker.v11-ready{display:block!important}',
+        '.v45-course-picker.v11-ready{display:block!important;grid-column:1/-1}',
+        '.v11-start-info-card{grid-column:1/-1;display:grid;grid-template-columns:auto repeat(3,minmax(0,1fr));gap:12px;align-items:center;margin:0;padding:13px 15px;border:1px solid #3e86bd;border-radius:16px;background:linear-gradient(135deg,rgba(54,163,255,.18),rgba(54,163,255,.07))}',
+        '.v11-start-info-card .v11-info-icon{font-size:26px;color:#61b7ff}.v11-start-info-card b{display:block;color:#eaf7ff;font-size:var(--app-control-font)}.v11-start-info-card small{display:block;color:#9fb9c8;font-size:var(--app-mini-font);font-weight:800;margin-bottom:3px}',
+        '.v11-setup-panel .v45-glance-instruments{display:grid!important;grid-template-columns:1fr 1fr!important;gap:14px!important;margin:16px 0 12px!important}.v11-setup-panel .v41-tide-card,.v11-setup-panel .v41-wind-glance{min-height:112px!important;border-radius:16px!important;padding:13px 15px!important}.v11-setup-panel .v41-wind-glance{text-align:left;align-items:flex-start}.v11-setup-panel .v41-wind-glance b{font-size:clamp(25px,5vw,39px)!important;color:#f7fbff}.v11-setup-panel .v41-card-label{font-size:var(--app-card-label-font)!important;letter-spacing:0!important;color:#cfe3ef!important}',
+        '.v11-setup-panel .v45-options-grid{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px!important;margin-top:14px!important}.v11-setup-panel .v45-awake .v45-check{min-height:54px!important;padding:10px 12px!important;border-radius:13px!important;font-size:var(--app-control-font)!important;font-weight:900}',
         '.v11-text-size-control{min-width:0}',
-        '@media(max-width:430px){.v11-course-dropdowns{grid-template-columns:1fr 1fr}.v11-course-dropdowns select{padding:8px 9px}}'
+        '.v11-race-week{margin-top:16px;padding:15px;border:1px solid var(--line);border-radius:16px;background:#071a24}.v11-race-week h3{display:flex;align-items:center;gap:8px;font-size:clamp(18px,3vw,25px);margin:0 0 12px}.v11-race-week-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.v11-race-card{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:1px solid #31566a;border-radius:16px;background:#0d2431;color:var(--text);padding:16px;min-height:100px}.v11-race-card.active{border-color:#1688ff;background:linear-gradient(135deg,rgba(22,136,255,.22),rgba(22,136,255,.06))}.v11-race-card.completed{opacity:.66}.v11-race-card i{display:flex;align-items:center;justify-content:center;width:54px;height:54px;border-radius:50%;background:#284252;color:#e9f5fa;font-style:normal;font-size:28px;flex:0 0 auto}.v11-race-card.active i{background:#0f65d8}.v11-race-card b{display:block;font-size:clamp(18px,3vw,28px);line-height:1.1}.v11-race-card span{display:block;color:#9eb9c8;margin-top:5px}.v11-race-card strong{display:block;color:#4ea3ff;margin-top:4px}',
+        'body.light-mode .v11-ready-banner{background:linear-gradient(135deg,#e8fff2,#f6fffa);border-color:#a8dfbd;color:#075b2b}',
+        'body.light-mode .v11-setup-panel .v45-course-banner{background:#fff!important;border-color:#9fc3d5!important;color:#07131d!important}',
+        'body.light-mode .v11-course-title,body.light-mode .v11-course-code,body.light-mode .v11-setup-panel .v41-wind-glance b,body.light-mode .v11-start-info-card b{color:#07131d!important}',
+        'body.light-mode .v11-course-route{color:#005bd8!important;text-shadow:none!important}body.light-mode .v11-course-route.empty{color:#405d6c!important}',
+        'body.light-mode .v11-setup-panel .v45-control label,body.light-mode .v11-setup-panel .v41-card-label{color:#082b5c!important}',
+        'body.light-mode .v11-setup-panel .v45-control select,body.light-mode .v11-setup-panel .v45-control input{background:#fff!important;color:#07131d!important;border-color:#8eabb9!important}',
+        'body.light-mode .v11-setup-panel .v45-control select option{background:#fff!important;color:#07131d!important}',
+        'body.light-mode .v11-class-sub{color:#244653!important}body.light-mode .v11-start-info-card{background:#e9f5ff;border-color:#98c2e0}body.light-mode .v11-start-info-card small{color:#315361!important}',
+        'body.light-mode .v11-race-week{background:#fff;border-color:#b9ccd6}body.light-mode .v11-race-card{background:#f3f8fb;color:#07131d;border-color:#bfd3dc}body.light-mode .v11-race-card.active{background:#eef7ff;border-color:#0079c9}body.light-mode .v11-race-card span{color:#405d6c}body.light-mode .v11-race-card strong{color:#005bd8}',
+        '@media(max-width:760px){.topstatus{display:none!important}.v11-setup-panel{padding:16px!important}.v11-setup-panel .v45-course-banner{grid-template-columns:1fr!important}.v11-setup-panel #v41OpenCourseBtn{width:100%}.v11-setup-panel .v45-setup-grid{grid-template-columns:1fr!important}.v11-start-info-card{grid-template-columns:auto 1fr 1fr!important}.v11-start-info-card .vhf{grid-column:2/4}.v11-setup-panel .v45-options-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.v11-setup-panel .v45-glance-instruments{grid-template-columns:1fr!important}.v11-race-week-grid{grid-template-columns:1fr 1fr}.v11-race-card{padding:13px;gap:10px}.v11-race-card i{width:44px;height:44px;font-size:23px}}',
+        '@media(max-width:430px){.v11-course-dropdowns{grid-template-columns:1fr 1fr}.v11-start-info-card{grid-template-columns:1fr!important}.v11-start-info-card .v11-info-icon{display:none}.v11-start-info-card .vhf{grid-column:auto}.v11-race-week-grid{grid-template-columns:1fr}.v11-setup-panel .v45-options-grid{grid-template-columns:1fr!important}.v11-setup-panel .v45-control select,.v11-setup-panel .v45-control input,.v11-setup-panel .v45-awake .v45-check{min-height:58px!important}.brand h1{font-size:24px!important}.brand small{font-size:15px!important}}'
       ].join('');
       document.head.appendChild(style);
+    }
+
+    function ensureSetupLayout(){
+      const panel = document.querySelector('.v45-setup-panel');
+      if (!panel) return;
+      panel.classList.add('v11-setup-panel');
+
+      const heading = panel.querySelector(':scope > h2');
+      if (heading && !byId('v11ReadyBanner')) {
+        heading.insertAdjacentHTML('afterend',
+          '<div class="v11-ready-banner" id="v11ReadyBanner"><i>✓</i><span>Setup complete — ready to sail!</span></div>');
+      }
+
+      const raceType = byId('raceType');
+      if (raceType) {
+        const dbsc = raceType.querySelector('option[value="dbsc"]');
+        const coastal = raceType.querySelector('option[value="freestyle"]');
+        const competition = raceType.querySelector('option[value="competition"]');
+        if (dbsc) dbsc.textContent = 'DBSC';
+        if (coastal) coastal.textContent = 'Coastal';
+        if (competition) competition.textContent = 'Multi-Boat Race';
+        const control = raceType.closest('.v45-control');
+        const label = control?.querySelector('label');
+        if (label) label.textContent = 'Race Type';
+      }
+
+      byId('day')?.closest('.v45-control')?.classList.add('v11-hidden-source');
+      byId('fleet')?.closest('.v45-control')?.classList.add('v11-hidden-source');
+      byId('scheduledStartDisplay')?.closest('.v45-control')?.classList.add('v45-warning');
+
+      const grid = panel.querySelector('.v45-setup-grid');
+      const raceControl = raceType?.closest('.v45-control');
+      if (grid && raceControl && !byId('v11ClassStart')) {
+        raceControl.insertAdjacentHTML('afterend',
+          '<div class="v45-control v11-class-control">' +
+            '<label for="v11ClassStart">Class / Start</label>' +
+            '<select id="v11ClassStart"></select>' +
+            '<div class="v11-class-sub" id="v11ClassStartMeta">—</div>' +
+          '</div>');
+      }
+      if (grid && !byId('v11StartInfo')) {
+        grid.insertAdjacentHTML('beforeend',
+          '<div class="v11-start-info-card" id="v11StartInfo">' +
+            '<div class="v11-info-icon">◷</div>' +
+            '<div><small>Warning</small><b id="v11InfoWarning">—</b></div>' +
+            '<div><small>Start Hut</small><b id="v11InfoStart">—</b></div>' +
+            '<div class="vhf"><small>VHF Channel</small><b id="v11InfoVhf">—</b></div>' +
+          '</div>');
+      }
+
+      const windLabel = document.querySelector('.v41-wind-glance .v41-card-label');
+      if (windLabel) windLabel.textContent = 'Wind Suggestion';
+      const tideLabel = document.querySelector('.v41-tide-card .v41-card-label');
+      if (tideLabel) tideLabel.textContent = 'Tide (Dún Laoghaire)';
+      const labels = {
+        startReference: 'Start Reference',
+        autoAdvance: 'Next Mark Radius',
+        mountMode: 'Phone',
+        appTextSize: 'Text Size'
+      };
+      Object.entries(labels).forEach(([id, text]) => {
+        const label = byId(id)?.closest('.v45-control')?.querySelector('label');
+        if (label) label.textContent = text;
+      });
+
+      if (!byId('v11RaceWeek')) {
+        const target = panel.querySelector('.v45-options-grid') || panel.querySelector('.v45-status-line');
+        target?.insertAdjacentHTML('afterend',
+          '<div class="v11-race-week" id="v11RaceWeek">' +
+            '<h3>▣ Race Week</h3>' +
+            '<div class="v11-race-week-grid">' +
+              '<button class="v11-race-card completed" type="button" data-v11-day="Thursday"><i>✓</i><span><b>Thu 10 Sept</b><strong>Completed</strong><span>DBSC Racing</span></span></button>' +
+              '<button class="v11-race-card active" type="button" data-v11-day="Saturday"><i>▲</i><span><b>Sat 12 Sept</b><strong>Next Race</strong><span>DBSC Racing</span></span></button>' +
+            '</div>' +
+          '</div>');
+      }
+      if (!raceWeekWired) {
+        document.querySelectorAll('[data-v11-day]').forEach(button => {
+          button.addEventListener('click', () => chooseRaceWeekDay(button.dataset.v11Day));
+        });
+        raceWeekWired = true;
+      }
+      wireClassStart();
+    }
+
+    function startInfo(){
+      if (byId('raceType')?.value === 'freestyle') {
+        return { warning: 'Manual', start: 'Coastal / freeform', vhf: '—', meta: 'Coastal course preset or manual route.' };
+      }
+      const fleet = byId('fleet')?.value || '';
+      const warning = (typeof selectedWarningTime === 'function' ? selectedWarningTime() : '') || '—';
+      const vhf = (fleet.match(/VHF\s*(\d+)/i) || [])[1] || '—';
+      const start = fleet.replace(/\s*·\s*VHF\s*\d+\s*/i, '').trim() || '—';
+      const meta = byId('cardInfo')?.textContent || '';
+      return { warning, start, vhf, meta };
+    }
+
+    function classStartOptions(){
+      const raceType = byId('raceType')?.value || 'dbsc';
+      if (raceType === 'freestyle') {
+        const courses = window.SparklesGPT?.active?.coastalCourses?.courses || {};
+        return [
+          { value: '', label: 'Manual / freeform' },
+          { value: 'cruiser_0_1', label: courses.cruiser_0_1?.label || 'Cruiser 0 & 1' },
+          { value: 'all_other', label: courses.all_other?.label || 'All Other Classes' }
+        ];
+      }
+      return Array.from(byId('fleet')?.options || []).map(option => ({ value: option.value, label: option.textContent || option.value }));
+    }
+
+    function selectedClassStartValue(){
+      if (byId('raceType')?.value === 'freestyle') {
+        try { return sessionStorage.getItem('sparklesCoastalCoursePreset') || localStorage.getItem(CLASS_START_KEY) || ''; } catch (err) { return ''; }
+      }
+      return byId('fleet')?.value || '';
+    }
+
+    function renderClassStart(){
+      const select = byId('v11ClassStart');
+      if (!select) return;
+      const options = classStartOptions();
+      const current = selectedClassStartValue();
+      select.innerHTML = options.map(option =>
+        '<option value="' + esc(option.value) + '"' + (option.value === current ? ' selected' : '') + '>' + esc(option.label) + '</option>'
+      ).join('');
+      if (current && !options.some(option => option.value === current) && options[0]) select.value = options[0].value;
+      updateClassStartMeta();
+    }
+
+    function updateClassStartMeta(){
+      const meta = byId('v11ClassStartMeta');
+      if (!meta) return;
+      const info = startInfo();
+      meta.textContent = byId('raceType')?.value === 'freestyle'
+        ? info.meta
+        : [info.start, info.vhf !== '—' ? 'VHF ' + info.vhf : '', info.warning !== '—' ? 'Warning ' + info.warning : ''].filter(Boolean).join(' · ');
+    }
+
+    function chooseClassStart(){
+      if (syncingClassStart) return;
+      const select = byId('v11ClassStart');
+      if (!select) return;
+      const value = select.value;
+      try { localStorage.setItem(CLASS_START_KEY, value); } catch (err) {}
+      if (byId('raceType')?.value === 'freestyle') {
+        if (value && window.SparklesGPT?.active?.coastalCourses?.loadPreset) {
+          window.SparklesGPT.active.coastalCourses.loadPreset(value);
+        } else {
+          try { sessionStorage.removeItem('sparklesCoastalCoursePreset'); } catch (err) {}
+        }
+      } else {
+        const fleet = byId('fleet');
+        if (fleet && fleet.value !== value && Array.from(fleet.options).some(option => option.value === value)) {
+          fleet.value = value;
+          fleet.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
+      setTimeout(syncSetupUI, 30);
+    }
+
+    function wireClassStart(){
+      if (classStartWired) return;
+      byId('v11ClassStart')?.addEventListener('change', chooseClassStart);
+      classStartWired = true;
+    }
+
+    function chooseRaceWeekDay(day){
+      const raceType = byId('raceType');
+      if (raceType && raceType.value !== 'dbsc') {
+        raceType.value = 'dbsc';
+        raceType.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      const daySelect = byId('day');
+      if (daySelect && Array.from(daySelect.options).some(option => option.value === day || option.textContent === day)) {
+        daySelect.value = day;
+        daySelect.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      setTimeout(syncSetupUI, 40);
     }
 
     function ensureCourseDropdowns(){
@@ -4795,13 +5010,101 @@ window.SparklesGPTUseActiveCoastalModule = true;
       if (select && select.value !== key) select.value = key;
     }
 
+    function routeText(){
+      if (Array.isArray(route) && route.length) return route.map(item => item.code || '').filter(Boolean).join(' → ');
+      return 'No course loaded';
+    }
+
+    function courseLabel(){
+      const raceType = byId('raceType')?.value || 'dbsc';
+      if (raceType === 'freestyle') {
+        const preset = byId('v11ClassStart')?.selectedOptions?.[0]?.textContent || '';
+        return preset && preset !== 'Manual / freeform' ? 'Coastal · ' + preset : 'Coastal / Freeform';
+      }
+      const day = byId('day')?.value || '—';
+      const info = startInfo();
+      return [day, info.start, info.vhf !== '—' ? 'VHF ' + info.vhf : ''].filter(Boolean).join(' · ');
+    }
+
+    function courseCode(){
+      if (byId('raceType')?.value === 'freestyle') return 'Coastal route';
+      return 'Course ' + (byId('course')?.value || '—');
+    }
+
+    function updateCourseBanner(){
+      const banner = document.querySelector('.v45-course-banner');
+      if (!banner) return;
+      if (!banner.classList.contains('v11-selected-course')) {
+        banner.classList.add('v11-selected-course');
+        banner.innerHTML =
+          '<div class="v11-course-heading">' +
+            '<div class="v11-course-flag">⚑</div>' +
+            '<div><small>Selected Course</small><div class="v11-course-title" id="v11CourseTitle">—</div><div class="v11-course-code" id="v11CourseCode">—</div><span class="v11-course-route" id="v41StartCourseRoute">—</span></div>' +
+          '</div>' +
+          '<button class="secondary" id="v41OpenCourseBtn" type="button">View Course →</button>';
+        byId('v41OpenCourseBtn')?.addEventListener('click', () => {
+          if (typeof openTab === 'function') openTab(byId('raceType')?.value === 'freestyle' ? 'freestyle' : 'startmarks');
+        });
+      }
+      const title = byId('v11CourseTitle');
+      const code = byId('v11CourseCode');
+      const routeEl = byId('v41StartCourseRoute');
+      if (title) title.textContent = courseLabel();
+      if (code) code.textContent = courseCode();
+      if (routeEl) {
+        const text = routeText();
+        routeEl.textContent = text;
+        routeEl.classList.toggle('empty', text === 'No course loaded');
+      }
+    }
+
+    function updateStartInfo(){
+      const info = startInfo();
+      if (byId('v11InfoWarning')) byId('v11InfoWarning').textContent = info.warning;
+      if (byId('v11InfoStart')) byId('v11InfoStart').textContent = info.start;
+      if (byId('v11InfoVhf')) byId('v11InfoVhf').textContent = info.vhf === '—' ? '—' : info.vhf;
+      updateClassStartMeta();
+    }
+
+    function updateReadyBanner(){
+      const banner = byId('v11ReadyBanner');
+      if (!banner) return;
+      const raceType = byId('raceType')?.value || 'dbsc';
+      const valid = raceType === 'freestyle'
+        ? Array.isArray(route) && route.length > 0
+        : !!(byId('day')?.value && byId('fleet')?.value && byId('course')?.value && Array.isArray(route) && route.length > 0);
+      banner.classList.toggle('valid', valid);
+    }
+
+    function updateRaceWeekCards(){
+      const day = byId('day')?.value || '';
+      document.querySelectorAll('[data-v11-day]').forEach(card => card.classList.toggle('active', card.dataset.v11Day === day && byId('raceType')?.value !== 'freestyle'));
+    }
+
+    function syncSetupUI(){
+      syncingClassStart = true;
+      try {
+        ensureSetupLayout();
+        ensureCourseDropdowns();
+        ensureTextSizeControl();
+        renderClassStart();
+        renderCourseDropdowns();
+        updateCourseBanner();
+        updateStartInfo();
+        updateReadyBanner();
+        updateRaceWeekCards();
+      } finally {
+        syncingClassStart = false;
+      }
+    }
+
     function installRenderHooks(){
-      if (window.SparklesGPT?.active?.setupAccessibility?.hooksInstalled) return;
+      if (hooksDone) return;
       const previousRender = typeof renderCoursePickerV45 === 'function' ? renderCoursePickerV45 : null;
       if (previousRender) {
         renderCoursePickerV45 = function(){
           previousRender();
-          renderCourseDropdowns();
+          syncSetupUI();
         };
       }
       const previousProjected = typeof updateProjectedCourseV45 === 'function' ? updateProjectedCourseV45 : null;
@@ -4811,21 +5114,41 @@ window.SparklesGPTUseActiveCoastalModule = true;
           renderCourseDropdowns();
         };
       }
+      const previousRoute = typeof renderRoute === 'function' ? renderRoute : null;
+      if (previousRoute) {
+        renderRoute = function(){
+          previousRoute();
+          setTimeout(syncSetupUI, 0);
+        };
+      }
+      const previousFullCourse = typeof renderFullCourse === 'function' ? renderFullCourse : null;
+      if (previousFullCourse) {
+        renderFullCourse = function(){
+          previousFullCourse();
+          setTimeout(syncSetupUI, 0);
+        };
+      }
+      ['raceType','day','fleet','course','windMode','startReference','autoAdvance','keepAwake'].forEach(id => {
+        byId(id)?.addEventListener('change', () => setTimeout(syncSetupUI, 35));
+      });
+      hooksDone = true;
     }
 
     function init(){
       setVersionLabels();
       ensureStyles();
+      ensureSetupLayout();
       ensureCourseDropdowns();
       ensureTextSizeControl();
       installRenderHooks();
-      renderCourseDropdowns();
+      syncSetupUI();
     }
 
     return {
       init,
       renderCourseDropdowns,
       applyTextSize,
+      syncSetupUI,
       hooksInstalled: true
     };
   })();
