@@ -10,14 +10,18 @@ SparklesGPT / DBSC Sailing revision history
 - 10 Sept 2026 v1: Adds weekend Coastal Course presets for Cruiser 0/1 and all other classes, including Muglins and the new orange inflatable mark east of the Muglins.
 - 10 Sept 2026 v3: Reverts the failed hand-shaped coastline attempt and uses the supplied Dublin coastline image as the active Coastal base layer beneath the existing GPS/course/wind overlay.
 - 10 Sept 2026 v4: Moves the orange inflatable mark to roughly 200 m east of Muglins while preserving the v3 coastline image base and route overlay.
+- 11 Sept 2026 v1: Replaces the DBSC course letter/number button strips with two native dropdowns for better high-zoom Samsung Chrome behaviour, and adds an app text-size setting.
+- 11 Sept 2026 v2: Increases the app text-size steps so Large and Extra large are much more visibly different.
+- 11 Sept 2026 v3: Makes the app text-size steps bigger again: Large 1.45x and Extra large 1.80x.
 
 Maintenance notes:
-- Current active Coastal code is in the final script: window.SparklesGPT.active.coastalMap.
-- Current active Coastal course preset code is in the final script: window.SparklesGPT.active.coastalCourses.
+- Current active Coastal code is in the late active module: window.SparklesGPT.active.coastalMap.
+- Current active Coastal course preset code is in the late active module: window.SparklesGPT.active.coastalCourses.
+- Current active DBSC setup accessibility code is in the final active module: window.SparklesGPT.active.setupAccessibility.
 - Older v50/v52/v4/v5 Coastal blocks are historical compatibility layers. Avoid editing them unless intentionally recovering an older behaviour.
 - For the next Coastal change, edit only the final active module and this revision history.
 -->
-<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/><meta content="#06111a" name="theme-color"/><title>SparklesGPT · DBSC Sailing · 10 Sept 2026 · v4</title><style>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/><meta content="#06111a" name="theme-color"/><title>SparklesGPT · DBSC Sailing · 11 Sept 2026 · v3</title><style>
 :root{--bg:#06111a;--panel:#0b1b27;--panel2:#102735;--text:#f4f8fb;--muted:#91a9b9;--accent:#36a3ff;--good:#62d86e;--warn:#ffcc4d;--red:#ff6868;--line:#1e3b4d}*{box-sizing:border-box}html{background:var(--bg)}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:linear-gradient(160deg,#0d2638,#06111a 40%);color:var(--text);min-height:100vh}button,select,input{font:inherit}.topbar{position:sticky;top:0;z-index:50;background:#07131df2;backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}.brandrow{max-width:1150px;margin:auto;padding:12px 16px 8px;display:flex;gap:12px;align-items:center;justify-content:space-between}.brand h1{font-size:20px;margin:0}.brand small{color:var(--muted)}.topstatus{display:flex;gap:7px;align-items:center}.mini{font-size:11px;padding:7px 9px;background:#102532;border:1px solid var(--line);border-radius:999px}.tabs{max-width:1150px;margin:auto;display:flex;gap:5px;overflow-x:auto;padding:4px 12px 10px;-webkit-overflow-scrolling:touch;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab-btn{white-space:nowrap;border:0;background:#102532;color:#b8d0de;padding:9px 13px;border-radius:12px;font-weight:800;font-size:12px}.tab-btn.active{background:var(--accent);color:#001522}.content{max-width:1150px;margin:auto;padding:18px 16px 70px}.tab-panel{display:none}.tab-panel.active{display:block}.panel{background:#0a1924e8;border:1px solid var(--line);border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 18px 50px #0004}.panel h2{font-size:22px;margin:0 0 6px}.panel h3{margin:0 0 8px}.lead{color:var(--muted);margin:0 0 16px;line-height:1.45}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#b4c8d5;margin:12px 0 5px}select,input{width:100%;background:#102532;color:white;border:1px solid #2b4d61;border-radius:12px;padding:11px 12px}.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}button{border:0;border-radius:13px;padding:11px 14px;font-weight:800;cursor:pointer}.primary{background:var(--accent);color:#001522}.secondary{background:#173143;color:#dff2ff}.danger{background:#47252b;color:#ffdfe3}.statuscard,.metric{background:#0e2330;border:1px solid var(--line);border-radius:16px;padding:14px}.metric small,.statuscard small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07em}.metric b{display:block;font-size:28px;margin-top:4px}.metric .sub{font-size:12px;color:var(--muted);margin-top:4px}.hero-nav{display:grid;grid-template-columns:1.3fr .7fr;gap:14px}.nextmark{background:linear-gradient(135deg,#102d40,#0c1d29);border:1px solid #28526b;border-radius:22px;padding:20px}.nextmark .code{font-size:34px;font-weight:900}.bigbearing{font-size:58px;font-weight:900;line-height:1}.arrow{font-size:52px;color:var(--accent);display:inline-block}.route-list{display:flex;gap:7px;flex-wrap:wrap}.chip{padding:7px 10px;border-radius:999px;background:#142b39;font-size:12px}.chip.next{background:#174566;color:#d7efff}.chip.port{border-bottom:2px solid var(--red)}.chip.starboard{border-bottom:2px solid var(--good)}.course-table-wrap{overflow:auto;max-width:100%;border:1px solid var(--line);border-radius:14px;-webkit-overflow-scrolling:touch}.course-table{width:max-content;min-width:900px;border-collapse:separate;border-spacing:0;font-size:12px}.course-table th,.course-table td{padding:9px;border-bottom:1px solid #163141;white-space:nowrap;background:#081720}.course-table th{background:#102936;color:#aac7d7;position:sticky;top:0}.course-table tr.active td{background:#12364e}.porttxt{color:#ff9696;font-weight:800}.startxt{color:#8aeb97;font-weight:800}.mapwrap{background:#06121b;border:1px solid var(--line);border-radius:20px;overflow:hidden}.mapwrap svg{display:block;width:100%;height:auto;min-height:420px}.maplegend{display:flex;flex-wrap:wrap;gap:12px;padding:10px 14px;color:var(--muted);font-size:12px}.guidebox{text-align:center;padding:28px 16px;background:linear-gradient(150deg,#0c2634,#071720);border:1px solid var(--line);border-radius:22px}.guidebox .main{font-size:38px;font-weight:900;color:var(--good)}.guidebox .detail{color:#c4dbe8;margin-top:8px}.windarrow{font-size:70px;color:var(--accent)}.tide-events{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tide-state{font-weight:900;color:var(--accent);font-size:26px}.progress{height:15px;border-radius:999px;background:#102532;overflow:hidden}.progress>div{height:100%;background:linear-gradient(90deg,#36a3ff,#62d86e);width:0}.timer{font-size:32px;font-weight:900;letter-spacing:.06em}.note{color:var(--muted);font-size:12px;line-height:1.5}.testing summary{cursor:pointer;color:#8aa7b7;font-weight:700}.mobileonly{display:none}@media(max-width:760px){.brandrow{align-items:flex-start}.topstatus{display:none}.content{padding:12px 10px 60px}.panel{padding:15px;border-radius:16px}.grid2,.grid3,.grid4,.hero-nav{grid-template-columns:1fr}.mapwrap svg{min-height:330px}.bigbearing{font-size:46px}.metric b{font-size:24px}.tabs{padding-left:8px;padding-right:8px}.mobileonly{display:block}.course-table{min-width:820px}}
 
 .chart-map{position:relative;width:100%;background:#d8f2ff;border:1px solid var(--line);border-radius:18px;overflow:hidden}
@@ -828,7 +832,7 @@ body.light-mode .v51-voice-transcript small{color:#405d6c!important}
 .v7sept-v4-route-arrow{fill:#1688ff;stroke:#fff;stroke-width:1.2}.v7sept-v4-leg-pill rect{fill:rgba(255,255,255,.92);stroke:#1264a3;stroke-width:1.1}.v7sept-v4-leg-pill text{font-size:10px;font-weight:1000;fill:#092435;paint-order:stroke;stroke:#fff;stroke-width:2px}.v7sept-v4-leg-pill.beat rect{stroke:#0079c9}.v7sept-v4-leg-pill.reach rect{stroke:#b88400}.v7sept-v4-leg-pill.run rect{stroke:#087a35}.chart-map.v7sept-v4-coastal-tracker{height:min(62vh,620px);min-height:360px;background:#95d7fb!important}.chart-map.v7sept-v4-coastal-tracker img{display:none!important}.chart-map.v7sept-v4-coastal-tracker svg{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;display:block!important;background:#95d7fb!important}.v7sept-v4-tracker-note{fill:#173a49;font-size:10px;font-weight:900;paint-order:stroke;stroke:#e9f6fb;stroke-width:2px}body.light-mode .v7sept-v4-leg-pill text{fill:#07131d!important;stroke:#fff!important}
 /* ===== 10 Sept 2026 v3: active Coastal module support styles ===== */
 .v7sept-v4-coastal-map{cursor:grab!important;touch-action:none!important}.v7sept-v4-coastal-map.dragging{cursor:grabbing!important}.v7sept-v5-full-btn{background:#21465d!important;color:#e9f7ff!important}.v7sept-v5-view-note{fill:#173a49;font-size:10px;font-weight:900;paint-order:stroke;stroke:#e9f6fb;stroke-width:2px}.v7sept-v5-hidden-mark{opacity:.55}.v7sept-v5-pan-hint{font-size:9px;color:var(--muted);font-weight:900;padding-left:4px}
-</style></head><body><header class="topbar"><div class="brandrow"><div class="brand"><h1>⛵ SparklesGPT</h1><small>DBSC Sailing App · 10 Sept 2026 · v4</small></div><div class="topstatus"><span class="mini" id="clock">--:--</span><span class="mini">GPS <b id="gpsStatus">Idle</b></span><span class="mini">Wind <b id="weatherStatus">—</b></span><span class="mini">Course <b id="courseStatus">—</b></span></div><button class="v45-theme-toggle" id="v45ThemeToggle" type="button" aria-label="Toggle light or dark display">&#9728; Light</button></div><nav class="tabs">
+</style></head><body><header class="topbar"><div class="brandrow"><div class="brand"><h1>⛵ SparklesGPT</h1><small>DBSC Sailing App · 11 Sept 2026 · v3</small></div><div class="topstatus"><span class="mini" id="clock">--:--</span><span class="mini">GPS <b id="gpsStatus">Idle</b></span><span class="mini">Wind <b id="weatherStatus">—</b></span><span class="mini">Course <b id="courseStatus">—</b></span></div><button class="v45-theme-toggle" id="v45ThemeToggle" type="button" aria-label="Toggle light or dark display">&#9728; Light</button></div><nav class="tabs">
 <button class="tab-btn active" data-tab="selection">Setup</button>
 <button class="tab-btn" data-tab="startmarks">Course</button>
 <button class="tab-btn" data-tab="freestyle" id="freestyleTabBtn">Coastal</button>
@@ -3684,7 +3688,7 @@ setTimeout(()=>{renderMobileCourseCardsV48();updateMarkNavV48()},30);
   if(typeof renderCompetitionMap==='function'){const before=renderCompetitionMap;renderCompetitionMap=function(){before();appendWind(byId('competitionMap'))}}
   if(typeof update==='function'){const before=update;update=function(){before();updateVmg();requestAnimationFrame(()=>{appendWind(byId('courseMap'));appendWind(byId('trackMap'))})}}
   const oldOpen=typeof openTab==='function'?openTab:null;if(oldOpen){openTab=function(name){oldOpen(name);if(name==='freestyle')requestAnimationFrame(()=>{if(typeof renderFreestyleMap==='function')renderFreestyleMap()})}}
-  function init(){document.querySelector('.brand small')&&(document.querySelector('.brand small').textContent='DBSC Sailing App · 10 Sept 2026 · v4');byId('voiceStatus')&&(byId('voiceStatus').style.display='none');updateVmg();requestAnimationFrame(()=>{if(typeof renderMap==='function')renderMap();if(typeof renderTrackerMap==='function')renderTrackerMap();if(typeof renderFreestyleMap==='function')renderFreestyleMap()})}
+  function init(){document.querySelector('.brand small')&&(document.querySelector('.brand small').textContent='DBSC Sailing App · 11 Sept 2026 · v3');byId('voiceStatus')&&(byId('voiceStatus').style.display='none');updateVmg();requestAnimationFrame(()=>{if(typeof renderMap==='function')renderMap();if(typeof renderTrackerMap==='function')renderTrackerMap();if(typeof renderFreestyleMap==='function')renderFreestyleMap()})}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
   if('ResizeObserver' in window){const h=byId('coastalNativeMap');if(h)new ResizeObserver(()=>requestAnimationFrame(()=>{if(typeof renderFreestyleMap==='function')renderFreestyleMap()})).observe(h)}
 })();
@@ -3790,7 +3794,7 @@ window.SparklesGPTUseActiveCoastalModule = true;
   const oldTracker=typeof renderTrackerMap==='function'?renderTrackerMap:null;renderTrackerMap=function(){if(typeof isFreestyle==='function'&&isFreestyle()){renderTrackerV5();return}const svg=byId('trackMap');svg?.closest('.chart-map')?.classList.remove('v7sept-v4-coastal-tracker');if(oldTracker)oldTracker()};
   const oldOpen=typeof openTab==='function'?openTab:null;openTab=function(name){if(oldOpen)oldOpen(name);if(name==='freestyle')requestAnimationFrame(()=>{ensureControls();wireMap();renderCoastalV5()});if(name==='tracker')requestAnimationFrame(renderTrackerMap)};
   const oldUpdate=typeof update==='function'?update:null;update=function(){if(oldUpdate)oldUpdate();requestAnimationFrame(()=>{if(typeof isFreestyle==='function'&&isFreestyle()){renderCoastalV5();renderTrackerV5()}})};
-  function init(){document.title='SparklesGPT · DBSC Sailing · 10 Sept 2026 · v4';const b=document.querySelector('.brand small');if(b)b.textContent='DBSC Sailing App · 10 Sept 2026 · v4';ensureControls();wireMap();setHome()}
+  function init(){document.title='SparklesGPT · DBSC Sailing · 11 Sept 2026 · v3';const b=document.querySelector('.brand small');if(b)b.textContent='DBSC Sailing App · 11 Sept 2026 · v3';ensureControls();wireMap();setHome()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
   requestAnimationFrame(()=>{ensureControls();wireMap();renderCoastalV5()});
   window.addEventListener('resize',()=>requestAnimationFrame(()=>{renderCoastalV5();if(typeof isFreestyle==='function'&&isFreestyle())renderTrackerV5()}));
@@ -3806,8 +3810,8 @@ window.SparklesGPTUseActiveCoastalModule = true;
   window.SparklesGPT.active = window.SparklesGPT.active || {};
 
   const CoastalMap = (function(){
-    const VERSION_TITLE = 'SparklesGPT · DBSC Sailing · 10 Sept 2026 · v4';
-    const VERSION_LABEL = 'DBSC Sailing App · 10 Sept 2026 · v4';
+    const VERSION_TITLE = 'SparklesGPT · DBSC Sailing · 11 Sept 2026 · v3';
+    const VERSION_LABEL = 'DBSC Sailing App · 11 Sept 2026 · v3';
     const W = 940;
     const H = 660;
     const FULL = { minLat: 53.160, maxLat: 53.405, minLon: -6.250, maxLon: -5.450 };
@@ -4454,8 +4458,8 @@ window.SparklesGPTUseActiveCoastalModule = true;
   window.SparklesGPT.active = window.SparklesGPT.active || {};
 
   const CoastalCourses = (function(){
-    const VERSION_TITLE = 'SparklesGPT · DBSC Sailing · 10 Sept 2026 · v4';
-    const VERSION_LABEL = 'DBSC Sailing App · 10 Sept 2026 · v4';
+    const VERSION_TITLE = 'SparklesGPT · DBSC Sailing · 11 Sept 2026 · v3';
+    const VERSION_LABEL = 'DBSC Sailing App · 11 Sept 2026 · v3';
     const STORAGE_KEY = 'sparklesCoastalCoursePreset';
     const MARK_DEFS = {
       MG: { name: 'Muglins', lat: 53.271300, lon: -6.071800, group: 'coastal', desc: 'Muglins island / coastal rounding reference' },
@@ -4628,6 +4632,209 @@ window.SparklesGPTUseActiveCoastalModule = true;
     document.addEventListener('DOMContentLoaded', CoastalCourses.init, { once: true });
   } else {
     CoastalCourses.init();
+  }
+})();
+</script>
+<script>
+/* ===== 11 Sept 2026 v3 ACTIVE MODULE: setup course dropdowns and app text size ===== */
+(function(){
+  window.SparklesGPT = window.SparklesGPT || {};
+  window.SparklesGPT.active = window.SparklesGPT.active || {};
+
+  const SetupAccessibility = (function(){
+    const VERSION_TITLE = 'SparklesGPT · DBSC Sailing · 11 Sept 2026 · v3';
+    const VERSION_LABEL = 'DBSC Sailing App · 11 Sept 2026 · v3';
+    const TEXT_SIZE_KEY = 'sparklesAppTextSize';
+    const sizes = {
+      normal: { label: 'Normal', scale: '1' },
+      large: { label: 'Large', scale: '1.45' },
+      xlarge: { label: 'Extra large', scale: '1.80' }
+    };
+    let wiringDone = false;
+
+    function byId(id){ return document.getElementById(id); }
+    function courseParts(value){
+      const match = String(value || '').match(/^([A-Z]+)(\d+)$/);
+      return match ? { letter: match[1], number: match[2] } : { letter: '', number: '' };
+    }
+    function availableCourses(){
+      if (typeof availableCoursesV45 === 'function') return availableCoursesV45();
+      return Array.from(byId('course')?.options || []).map(option => option.value).filter(Boolean);
+    }
+    function currentParts(){
+      if (typeof currentCoursePartsV45 === 'function') return currentCoursePartsV45();
+      return courseParts(byId('course')?.value);
+    }
+    function projectedLetters(){
+      try {
+        const projected = typeof projectedCourseV45 === 'function' ? projectedCourseV45() : { letters: [] };
+        return new Set(projected.letters || []);
+      } catch (err) {
+        return new Set();
+      }
+    }
+
+    function setVersionLabels(){
+      document.title = VERSION_TITLE;
+      const brand = document.querySelector('.brand small');
+      if (brand) brand.textContent = VERSION_LABEL;
+    }
+
+    function ensureStyles(){
+      if (byId('setupAccessibilityStyles')) return;
+      const style = document.createElement('style');
+      style.id = 'setupAccessibilityStyles';
+      style.textContent = [
+        'html{--app-text-scale:1}',
+        'html[data-app-text-size="large"]{--app-text-scale:1.45}',
+        'html[data-app-text-size="xlarge"]{--app-text-scale:1.80}',
+        'html[data-app-text-size] body{font-size:calc(16px * var(--app-text-scale))}',
+        'html[data-app-text-size] select,html[data-app-text-size] input,html[data-app-text-size] button{font-size:calc(14px * var(--app-text-scale))}',
+        'html[data-app-text-size] label{font-size:calc(11px * var(--app-text-scale))}',
+        'html[data-app-text-size] .tab-btn{font-size:calc(12px * var(--app-text-scale));line-height:1.15}',
+        'html[data-app-text-size] .mini{font-size:calc(11px * var(--app-text-scale))}',
+        'html[data-app-text-size] .note,html[data-app-text-size] .lead{font-size:calc(12px * var(--app-text-scale))}',
+        '.v11-course-dropdowns{display:grid;grid-template-columns:minmax(0,1fr) minmax(92px,.55fr);gap:8px;align-items:end;margin:2px 0 4px}',
+        '.v11-course-dropdowns label{margin-top:0}',
+        '.v11-course-dropdowns select{min-width:0}',
+        '.v45-course-picker .v45-picker-row{display:none!important}',
+        '.v45-course-picker .v45-native-course{display:none!important}',
+        '.v45-course-picker.v11-ready{display:block!important}',
+        '.v11-text-size-control{min-width:0}',
+        '@media(max-width:430px){.v11-course-dropdowns{grid-template-columns:1fr 1fr}.v11-course-dropdowns select{padding:8px 9px}}'
+      ].join('');
+      document.head.appendChild(style);
+    }
+
+    function ensureCourseDropdowns(){
+      const picker = document.querySelector('.v45-course-picker');
+      if (!picker) return;
+      picker.classList.add('v11-ready');
+      if (!byId('v11CourseDropdowns')) {
+        picker.insertAdjacentHTML('afterbegin',
+          '<div class="v11-course-dropdowns" id="v11CourseDropdowns">' +
+            '<div><label for="v11CourseLetter">Course letter</label><select id="v11CourseLetter" aria-label="Course letter"></select></div>' +
+            '<div><label for="v11CourseNumber">Number</label><select id="v11CourseNumber" aria-label="Course number"></select></div>' +
+          '</div>');
+      }
+      if (!wiringDone) {
+        byId('v11CourseLetter')?.addEventListener('change', () => chooseFromDropdowns('letter'));
+        byId('v11CourseNumber')?.addEventListener('change', () => chooseFromDropdowns('number'));
+        wiringDone = true;
+      }
+      renderCourseDropdowns();
+    }
+
+    function chooseFromDropdowns(source){
+      const courses = availableCourses();
+      const letter = byId('v11CourseLetter')?.value || currentParts().letter;
+      let number = byId('v11CourseNumber')?.value || currentParts().number;
+      const numbers = courses.filter(code => courseParts(code).letter === letter).map(code => courseParts(code).number);
+      if (source === 'letter' && !numbers.includes(number)) number = numbers[0] || '';
+      const key = letter + number;
+      const course = byId('course');
+      if (!course || !key || !courses.includes(key)) return;
+      course.value = key;
+      course.dispatchEvent(new Event('change', { bubbles: true }));
+      setTimeout(renderCourseDropdowns, 0);
+    }
+
+    function renderCourseDropdowns(){
+      const letterSelect = byId('v11CourseLetter');
+      const numberSelect = byId('v11CourseNumber');
+      if (!letterSelect || !numberSelect) return;
+      const courses = availableCourses();
+      const parts = currentParts();
+      const order = typeof DBSC_WIND_FAMILIES_V45 !== 'undefined' ? DBSC_WIND_FAMILIES_V45.map(item => item[0]) : [];
+      const letters = [...new Set(courses.map(code => courseParts(code).letter).filter(Boolean))];
+      letters.sort((a, b) => {
+        const ai = order.indexOf(a), bi = order.indexOf(b);
+        if (ai === -1 && bi === -1) return a.localeCompare(b);
+        if (ai === -1) return 1;
+        if (bi === -1) return -1;
+        return ai - bi;
+      });
+      const projected = projectedLetters();
+      letterSelect.innerHTML = letters.map(letter => {
+        const prefix = projected.has(letter) ? '* ' : '';
+        const suffix = projected.has(letter) ? ' - projected' : '';
+        return '<option value="' + letter + '"' + (letter === parts.letter ? ' selected' : '') + '>' + prefix + letter + suffix + '</option>';
+      }).join('');
+      const selectedLetter = letterSelect.value || parts.letter || letters[0] || '';
+      const numbers = courses.filter(code => courseParts(code).letter === selectedLetter).map(code => courseParts(code).number);
+      numberSelect.innerHTML = numbers.map(number =>
+        '<option value="' + number + '"' + (number === parts.number ? ' selected' : '') + '>' + number + '</option>'
+      ).join('');
+    }
+
+    function ensureTextSizeControl(){
+      const grid = document.querySelector('.v45-options-grid');
+      if (!grid || byId('appTextSize')) return;
+      grid.insertAdjacentHTML('beforeend',
+        '<div class="v45-control v11-text-size-control">' +
+          '<label for="appTextSize">Text size</label>' +
+          '<select id="appTextSize">' +
+            '<option value="normal">Normal</option>' +
+            '<option value="large">Large</option>' +
+            '<option value="xlarge">Extra large</option>' +
+          '</select>' +
+        '</div>');
+      const select = byId('appTextSize');
+      const saved = localStorage.getItem(TEXT_SIZE_KEY) || 'normal';
+      if (select && sizes[saved]) select.value = saved;
+      select?.addEventListener('change', () => applyTextSize(select.value));
+      applyTextSize(select?.value || 'normal');
+    }
+
+    function applyTextSize(value){
+      const key = sizes[value] ? value : 'normal';
+      document.documentElement.dataset.appTextSize = key;
+      document.documentElement.style.setProperty('--app-text-scale', sizes[key].scale);
+      try { localStorage.setItem(TEXT_SIZE_KEY, key); } catch (err) {}
+      const select = byId('appTextSize');
+      if (select && select.value !== key) select.value = key;
+    }
+
+    function installRenderHooks(){
+      if (window.SparklesGPT?.active?.setupAccessibility?.hooksInstalled) return;
+      const previousRender = typeof renderCoursePickerV45 === 'function' ? renderCoursePickerV45 : null;
+      if (previousRender) {
+        renderCoursePickerV45 = function(){
+          previousRender();
+          renderCourseDropdowns();
+        };
+      }
+      const previousProjected = typeof updateProjectedCourseV45 === 'function' ? updateProjectedCourseV45 : null;
+      if (previousProjected) {
+        updateProjectedCourseV45 = function(){
+          previousProjected();
+          renderCourseDropdowns();
+        };
+      }
+    }
+
+    function init(){
+      setVersionLabels();
+      ensureStyles();
+      ensureCourseDropdowns();
+      ensureTextSizeControl();
+      installRenderHooks();
+      renderCourseDropdowns();
+    }
+
+    return {
+      init,
+      renderCourseDropdowns,
+      applyTextSize,
+      hooksInstalled: true
+    };
+  })();
+
+  window.SparklesGPT.active.setupAccessibility = SetupAccessibility;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', SetupAccessibility.init, { once: true });
+  } else {
+    SetupAccessibility.init();
   }
 })();
 </script></body></html>
